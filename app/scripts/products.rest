@@ -1,0 +1,21 @@
+### Devuelve todas los productos
+GET http://localhost:3000/products
+
+### Devuelve un producto según el /id
+GET http://localhost:3000/products/5
+
+### Elimina segun id
+DELETE  http://localhost:3000/products/5
+
+
+### Guardar un producto
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+    "name": "Productoasdsads ",
+    "description": "Producto productero",
+    "stock": 100,
+    "price": 150.51,
+    "categoryName": "Alimento"
+}

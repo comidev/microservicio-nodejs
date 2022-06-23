@@ -1,0 +1,7 @@
+### Guardar una nota
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+    "name": "Adultos"
+}
