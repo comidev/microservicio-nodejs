@@ -1,5 +1,4 @@
-const mongoose = require("mongoose");
-const { model, Schema } = mongoose;
+const { model, Schema } = require("mongoose");
 
 const ProductScheme = new Schema(
     {
@@ -10,7 +9,7 @@ const ProductScheme = new Schema(
         status: String,
         category: {
             type: Schema.Types.ObjectId,
-            ref: "category",
+            ref: "categories",
         },
     },
     {
@@ -19,4 +18,4 @@ const ProductScheme = new Schema(
     }
 );
 
-module.exports = model("product", ProductScheme);  
+module.exports = model("products", ProductScheme);
