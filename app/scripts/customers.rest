@@ -1,0 +1,32 @@
+### Devuelve todas los CLIENTES
+GET http://localhost:3000/customers
+
+### Devuelve un CLIENTE según el /id
+GET http://localhost:3000/customers/62b63515c9a8a590e014cd0f
+
+### Guardar un CLIENTE
+POST http://localhost:3000/customers
+Content-Type: application/json
+
+{
+    "dni" : "70889652",
+    "name" : "Cesar Miranda",
+    "email" : "cesar@gmail.com",
+    "photoUrl" : "none",
+    "user" : {
+        "username" : "cesar",
+        "password" : "123"
+    },
+    "regionName" : "Gorgor"
+}
+
+### Guarda una REGION
+POST http://localhost:3000/customers/regions
+Content-Type: application/json
+
+{
+   "name" : "Gorgor"
+}
+
+### Elimina un CLIENTE por ID
+DELETE  http://localhost:3000/customers/62b63515c9a8a590e014cd0f

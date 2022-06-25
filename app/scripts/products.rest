@@ -2,7 +2,7 @@
 GET http://localhost:3000/products
 
 ### Devuelve un producto según el /id
-GET http://localhost:3000/products/5
+GET http://localhost:3000/products/62b63515c9a8a590e014cd0f
 
 ### Elimina segun id
 DELETE  http://localhost:3000/products/5
@@ -13,9 +13,9 @@ POST http://localhost:3000/products
 Content-Type: application/json
 
 {
-    "name": "Productoasdsads ",
+    "name": "Producto n03",
     "description": "Producto productero",
     "stock": 100,
-    "price": 150.51,
-    "categoryName": "Alimento"
+    "price": 150.5,
+    "categoryName": "categoria con un nombre superlargo"
 }

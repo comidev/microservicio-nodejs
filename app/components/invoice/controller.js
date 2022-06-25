@@ -4,8 +4,8 @@ module.exports = {
     save: async (req, res, next) => {
         try {
             const invoice = req.body;
-            const invoiceDB = invoiceService.save(invoice);
-            res.status(204);
+            const invoiceDB = await invoiceService.save(invoice);
+            res.status(201);
             res.send(invoiceDB);
         } catch (error) {
             next(error);
@@ -14,7 +14,7 @@ module.exports = {
     findAll: async (req, res, next) => {
         try {
             const invoicesDB = await invoiceService.findAll();
-            res.status(200);
+            res.status(invoicesDB.length === 0 ? 204 : 200);
             res.send(invoicesDB);
         } catch (error) {
             next(error);

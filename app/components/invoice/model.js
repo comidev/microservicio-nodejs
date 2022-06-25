@@ -10,7 +10,7 @@ const InvoiceSchema = new Schema(
         invoiceItems: [
             {
                 type: Schema.Types.ObjectId,
-                ref: "invoiceItems",
+                ref: "invoice_items",
             },
         ],
         state: String,

@@ -1,0 +1,23 @@
+### Devuelve todas los usuarios
+GET http://localhost:3000/users
+
+### Devuelve un usuario según el /id
+GET http://localhost:3000/users/62b63515c9a8a590e014cd0f
+
+### Guardar un usuarios admin
+POST http://localhost:3000/users/admin
+Content-Type: application/json
+
+{
+    "username" : "admin",
+    "password" : "admin"
+}
+
+### Login (obtiene jwt)
+POST http://localhost:3000/users/login
+Content-Type: application/json
+
+{
+    "username" : "omar",
+    "password" : "123"
+}

@@ -1,10 +1,9 @@
 const error404 = (req, res, next) => {
-    console.log(req);
     res.status(404);
     res.send({
-        error: "NOT FOUND",
+        error: "404 - NOT_FOUND",
         message: "Esta ruta no esta registrada :(",
-        path: "",
+        path: `${req.method} - ${req.url}`,
     });
 };
 

@@ -5,7 +5,7 @@ module.exports = {
         try {
             const customer = req.body;
             const customerDB = await customerService.save(customer);
-            res.status(204);
+            res.status(201);
             res.send(customerDB);
         } catch (error) {
             next(error);
@@ -44,7 +44,7 @@ module.exports = {
         try {
             const { name } = req.body;
             const regionDB = await customerService.saveRegion(name);
-            res.status(204);
+            res.status(201);
             res.send(regionDB);
         } catch (error) {
             next(error);

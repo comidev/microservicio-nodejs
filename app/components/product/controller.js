@@ -5,7 +5,7 @@ module.exports = {
         try {
             const product = req.body;
             const productDB = await productService.save(product);
-            res.status(204);
+            res.status(201);
             res.send(productDB);
         } catch (error) {
             next(error);

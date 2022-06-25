@@ -1,0 +1,25 @@
+### Devuelve todas los usuarios
+GET http://localhost:3000/invoices
+
+### Devuelve un usuario según el /id
+GET http://localhost:3000/invoices/62b63515c9a8a590e014cd0f
+
+### Guardar un usuarios admin
+POST http://localhost:3000/invoices
+Content-Type: application/json
+
+{
+    "description" : "muchos productos :v",
+    "customerId" : "62b662f2d2e8fa711a0eabff",
+    "invoiceItems" : [
+        {
+            "productId": "62b635f44fcd649e90e1934b",
+            "quantity" : 2
+        },
+        {
+            "productId": "62b63515c9a8a590e014cd0f",
+            "quantity" : 5
+        }
+    ]
+
+}

@@ -15,7 +15,7 @@ module.exports = {
         try {
             const user = req.body;
             const userDB = await userService.saveCliente(user);
-            res.status(200);
+            res.status(201);
             res.send(userDB);
         } catch (error) {
             next(error);
@@ -25,7 +25,7 @@ module.exports = {
         try {
             const user = req.body;
             const userDB = await userService.saveAdmin(user);
-            res.status(200);
+            res.status(201);
             res.send(userDB);
         } catch (error) {
             next(error);
@@ -43,7 +43,7 @@ module.exports = {
     findById: async (req, res, next) => {
         try {
             const { id } = req.params;
-            const userDB = await userService.findByID(id);
+            const userDB = await userService.findById(id);
             res.status(200);
             res.send(userDB);
         } catch (error) {

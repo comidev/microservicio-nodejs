@@ -1,7 +1,14 @@
-### Guardar una nota
+### Guardar una categoria
 POST http://localhost:3000/categories
 Content-Type: application/json
 
 {
-    "name": "Adultos"
+    "name": "Tecnologia"
 }
+
+
+### Ver todas las categorias
+GET http://localhost:3000/categories
+
+### Ver todas una categoria por ID
+GET http://localhost:3000/categories/62b63129948f4631505acb35

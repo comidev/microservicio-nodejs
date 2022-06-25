@@ -22,31 +22,41 @@ const HttpStatusCode = {
     503: "SERVICE_UNAVAILABLE",
 };
 
-const httpError = (status, message) => {
-    return new Error(`${status}${ERROR_SPLIT}${message}`);
-};
+const HttpError = (status, message) =>
+    new Error(`${status}${ERROR_SPLIT}${message}`);
 
 const handleGeneralError = (error, req, res, next) => {
+    console.log(`------- ERROR - ${new Date().toISOString()} --------`);
+    const path = `${req.method} - ${req.url}`;
+
     if (!error.message.includes(ERROR_SPLIT)) {
-        res.status(500);
-        res.send({
-            error: "INTERNAL_SERVER_ERROR",
+        const messageError = {
+            error: "??? - UNEXPECTED_ERROR",
             message: error.message,
-            path: "path :v",
-        });
+            path,
+        };
+        res.status(500);
+        res.send(messageError);
+        console.log(messageError);
+        return;
     }
 
     const [status, message] = error.message.split(ERROR_SPLIT);
-    console.log({ error, res, status, message });
-
     const STATUS = Number(status);
 
-    res.status(STATUS);
-    res.send({
-        error: HttpStatusCode[STATUS],
+    const messageError = {
+        error: `${STATUS} - ${HttpStatusCode[STATUS]}`,
         message,
-        path: "path :v",
-    });
+        path,
+    };
+
+    res.status(STATUS);
+    res.send(messageError);
+    console.log(messageError);
 };
 
-module.exports = { HttpStatus, httpError, handleGeneralError };
+module.exports = {
+    HttpStatus,
+    HttpError,
+    handleGeneralError,
+};

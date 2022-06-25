@@ -5,15 +5,16 @@ module.exports = {
         try {
             const category = req.body;
             const categoryDB = await categoryService.save(category);
+            res.status(201);
             res.send(categoryDB);
         } catch (error) {
             next(error);
         }
     },
-    findById: (req, res, next) => {
+    findById: async (req, res, next) => {
         try {
             const { id } = req.params;
-            const categoryDB = categoryService.findById(id);
+            const categoryDB = await categoryService.findById(id);
             res.send(categoryDB);
         } catch (error) {
             next(error);

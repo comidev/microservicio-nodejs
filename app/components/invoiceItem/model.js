@@ -14,6 +14,6 @@ const InvoiceItemSchema = new Schema(
     }
 );
 
-const InvoiceItemModel = model("invoicesItems", InvoiceItemSchema);
+const InvoiceItemModel = model("invoices_items", InvoiceItemSchema);
 
 module.exports = InvoiceItemModel;
