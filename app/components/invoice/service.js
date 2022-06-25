@@ -57,4 +57,12 @@ module.exports = {
         }
         return invoiceDB;
     },
+    findByCustomerId: async (id) => {
+        const invoicesDB = await invoiceRepo.find({ customer: id });
+        if (!invoicesDB) {
+            const message = `El cliente no tiene compras :(`;
+            throw HttpError(HttpStatus.NOT_FOUND, message);
+        }
+        return invoicesDB;
+    },
 };

@@ -2,13 +2,14 @@ const { HttpStatus, HttpError } = require("../../middleware/handleError");
 const passwordEncoder = require("bcrypt");
 const userRepo = require("./model");
 const roleRepo = require("../role/model");
+const jwtService = require("../../services/jwt");
+
+const SAL_ROUND = 10;
 
 const ROLES = {
     CLIENTE: "CLIENTE",
     ADMIN: "ADMIN",
 };
-
-const SAL_ROUND = 10;
 
 const findByUsername = async (username) =>
     await userRepo.findOne({ username: username });
@@ -23,6 +24,7 @@ const saveUserWithRole = async (user, roleName) => {
     const role =
         (await roleRepo.findOne({ name: roleName })) ||
         (await roleRepo.create({ name: roleName }));
+    
 
     const password = await passwordEncoder.hash(user.password, SAL_ROUND);
 
@@ -41,7 +43,6 @@ module.exports = {
             throw HttpError(HttpStatus.FORBBIDEN, message);
         }
 
-
         const passwordIsCorrect = await passwordEncoder.compare(
             user.password,
             userDB.password
@@ -51,7 +52,20 @@ module.exports = {
             const message = `Username '${user.username}' o password incorrecto!`;
             throw HttpError(HttpStatus.FORBBIDEN, message);
         }
-        return userDB;
+
+        const rolesDB = [];
+        for (const roles of userDB.roles) {
+            const roleDB = await roleRepo.findById(roles);
+            rolesDB.push(roleDB.name);
+        }
+
+        console.log({ rolesDB });
+
+        return jwtService.createTokens({
+            id: userDB._id,
+            username: userDB.username,
+            roles: rolesDB,
+        });
     },
 
     saveCliente: async (user) => await saveUserWithRole(user, ROLES.CLIENTE),
@@ -66,5 +80,9 @@ module.exports = {
             throw HttpError(HttpStatus.NOT_FOUND, `User no encontrado!`);
         }
         return userDB;
+    },
+    tokenRefresh: (tokenRefresh) => {
+        const payload = jwtService.verify(tokenRefresh);
+        return jwtService.createTokens(payload);
     },
 };

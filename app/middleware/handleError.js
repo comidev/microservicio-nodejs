@@ -11,52 +11,41 @@ const HttpStatus = {
     SERVICE_UNAVAILABLE: 503,
 };
 
-const HttpStatusCode = {
-    400: "BAD_REQUEST",
+const HttpStatusName = {
+    400: "BAD REQUEST",
     401: "UNAUTHORIZED",
     403: "FORBBIDEN",
-    404: "NOT_FOUND",
-    406: "NOT_ACCEPTABLE",
+    404: "NOT FOUND",
+    406: "NOT ACCEPTABLE",
     409: "CONFLICT",
-    500: "INTERNAL_SERVER_ERROR",
-    503: "SERVICE_UNAVAILABLE",
+    500: "INTERNAL SERVER ERROR",
+    503: "SERVICE UNAVAILABLE",
 };
-
+// TODO: ERROR PERSONALIZADO
 const HttpError = (status, message) =>
     new Error(`${status}${ERROR_SPLIT}${message}`);
 
 const handleGeneralError = (error, req, res, next) => {
-    console.log(`------- ERROR - ${new Date().toISOString()} --------`);
     const path = `${req.method} - ${req.url}`;
 
     if (!error.message.includes(ERROR_SPLIT)) {
-        const messageError = {
-            error: "??? - UNEXPECTED_ERROR",
+        res.status(500);
+        res.send({
+            error: "??? - UNEXPECTED ERROR",
             message: error.message,
             path,
-        };
-        res.status(500);
-        res.send(messageError);
-        console.log(messageError);
+        });
         return;
     }
-
+    // TODO: RECUPERAMOS ERROR Y MANDAMOS!
     const [status, message] = error.message.split(ERROR_SPLIT);
     const STATUS = Number(status);
-
-    const messageError = {
-        error: `${STATUS} - ${HttpStatusCode[STATUS]}`,
+    res.status(STATUS);
+    res.send({
+        error: `${STATUS} - ${HttpStatusName[STATUS]}`,
         message,
         path,
-    };
-
-    res.status(STATUS);
-    res.send(messageError);
-    console.log(messageError);
+    });
 };
 
-module.exports = {
-    HttpStatus,
-    HttpError,
-    handleGeneralError,
-};
+module.exports = { HttpStatus, HttpError, handleGeneralError };

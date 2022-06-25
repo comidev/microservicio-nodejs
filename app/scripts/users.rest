@@ -1,11 +1,26 @@
-### Devuelve todas los usuarios
+### Devuelve todas los usuarios | TOKEN  | ROL: ADMIN
 GET http://localhost:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzM3MjYsImV4cCI6MTY1NjE3NTUyNiwiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.tUO9u-eQvxbh17oZ_VeTZ0VOFuXS5B4CaIFceyWzjPc
 
-### Devuelve un usuario según el /id
-GET http://localhost:3000/users/62b63515c9a8a590e014cd0f
 
-### Guardar un usuarios admin
+### Devuelve un usuario según el /id | TOKEN   | ROL: ADMIN, CLIENTE
+GET http://localhost:3000/users/62b640a29054f77fe83e788c
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzM3MjYsImV4cCI6MTY1NjE3NTUyNiwiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.tUO9u-eQvxbh17oZ_VeTZ0VOFuXS5B4CaIFceyWzjPc
+
+
+### Guardar un usuarios admin | TOKEN   | ROL: ADMIN
 POST http://localhost:3000/users/admin
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzM3MjYsImV4cCI6MTY1NjE3NTUyNiwiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.tUO9u-eQvxbh17oZ_VeTZ0VOFuXS5B4CaIFceyWzjPc
+
+{
+    "username" : "admin",
+    "password" : "admin"
+}
+
+
+### Login (obtiene jwt)
+POST http://localhost:3000/users/login
 Content-Type: application/json
 
 {
@@ -13,11 +28,7 @@ Content-Type: application/json
     "password" : "admin"
 }
 
-### Login (obtiene jwt)
-POST http://localhost:3000/users/login
-Content-Type: application/json
 
-{
-    "username" : "omar",
-    "password" : "123"
-}
+### Token refresh (obtiene jwt por Token refresh) | TOKEN-REFRESH
+POST http://localhost:3000/users/token/refresh
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzM3MjYsImV4cCI6MTY1NjE3NTUyNiwiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.tUO9u-eQvxbh17oZ_VeTZ0VOFuXS5B4CaIFceyWzjPc

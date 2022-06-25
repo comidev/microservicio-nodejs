@@ -30,4 +30,14 @@ module.exports = {
             next(error);
         }
     },
+    findByCustomerId: async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const invoicesDB = await invoiceService.findByCustomerId(id);
+            res.status(200);
+            res.send(invoicesDB);
+        } catch (error) {
+            next(error);
+        }
+    },
 };

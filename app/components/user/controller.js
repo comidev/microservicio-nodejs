@@ -4,19 +4,9 @@ module.exports = {
     login: async (req, res, next) => {
         try {
             const user = req.body;
-            const userDB = await userService.login(user);
+            const tokens = await userService.login(user);
             res.status(200);
-            res.send(userDB);
-        } catch (error) {
-            next(error);
-        }
-    },
-    saveCliente: async (req, res, next) => {
-        try {
-            const user = req.body;
-            const userDB = await userService.saveCliente(user);
-            res.status(201);
-            res.send(userDB);
+            res.send(tokens);
         } catch (error) {
             next(error);
         }
@@ -46,6 +36,16 @@ module.exports = {
             const userDB = await userService.findById(id);
             res.status(200);
             res.send(userDB);
+        } catch (error) {
+            next(error);
+        }
+    },
+    tokenRefresh: (req, res, next) => {
+        try {
+            const authorization = req.get("authorization");
+            const tokens = userService.tokenRefresh(authorizacion);
+            res.status(200);
+            res.send(tokens);
         } catch (error) {
             next(error);
         }
