@@ -1,0 +1,15 @@
+### Guardar una categoria | TOKEN | ROL: ADMIN
+POST http://localhost:3000/categories
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjhhM2NkMWQzMjMxYjMzYTc4NGMzMyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYyNzI4MjAsImV4cCI6MTY1NjI3NDYyMCwiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.CWssP59OJbg3K0q9Si7Yt0QmK3irOchtuLtPndY0vbw
+
+{
+    "name": "Tecnologia"
+}
+
+
+### Ver todas las categorias
+GET http://localhost:3000/categories
+
+### Ver todas una categoria por ID
+GET http://localhost:3000/categories/62b8b88b0610312789f77cad
