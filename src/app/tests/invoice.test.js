@@ -1,35 +1,28 @@
 const supertest = require("supertest");
 const mongoose = require("mongoose");
-const shortUUID = require("short-uuid");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
-const {
-    initInvoices,
-    createCustomer,
-    createInvoice,
-    createProduct,
-} = require("./helpers/index");
-
+const { createInvoice, createCustomer, createProduct } = require("./helpers/index");
 const invoiceRepo = require("../services/model/mongodb/invoice");
+const invoiceItemRepo = require("../services/model/mongodb/invoiceItem");
 const API = supertest(app);
 
-const generateId = () => mongoose.Types.ObjectId();
-
-let invoicesIds = [];
 beforeEach(async () => {
     await invoiceRepo.deleteMany();
-    invoicesIds = await initInvoices();
 });
 
 describe("GET /invoices", () => {
     test("NO CONTENT, cuando no hay compras", async () => {
-        await invoiceRepo.deleteMany();
         const response = await API.get(`/invoices`).send();
+
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
 
     test("OK, cuando hay al menos una compra", async () => {
+        await createInvoice();
+
         const response = await API.get(`/invoices`).send();
+
         expect(response.status).toBe(HttpStatus.OK);
     });
 });
@@ -37,12 +30,15 @@ describe("GET /invoices", () => {
 describe("GET /invoices/:id", () => {
     test("NOT FOUND, cuando el id es incorrecto", async () => {
         const response = await API.get(`/invoices/123`).send();
+
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     test("OK, cuando el id es correcto", async () => {
-        const id = invoicesIds[0];
-        const response = await API.get(`/invoices/${id}`).send();
+        const { _id } = await createInvoice();
+
+        const response = await API.get(`/invoices/${_id}`).send();
+
         expect(response.status).toBe(HttpStatus.OK);
     });
 });
@@ -50,23 +46,24 @@ describe("GET /invoices/:id", () => {
 describe("GET /invoices/customer/:id", () => {
     test("NOT FOUND, cuando el id es incorrecto", async () => {
         const response = await API.get(`/invoices/customer/123`).send();
+
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     test("NO CONTENT, cuando el id es correcto pero no tiene compras", async () => {
-        const customerIdFeik = generateId();
-        const response = await API.get(
-            `/invoices/customer/${customerIdFeik}`
-        ).send();
+        const { _id } = await createCustomer();
+
+        const response = await API.get(`/invoices/customer/${_id}`).send();
+
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
 
     test("OK, cuando el id es correcto y tiene al menos una compra", async () => {
-        const customerIdFeik = generateId();
-        const { _id: id } = await createInvoice({ _id: customerIdFeik });
-        const response = await API.get(
-            `/invoices/customer/${customerIdFeik}`
-        ).send();
+        const { _id: customerId } = await createCustomer();
+        await createInvoice({ customerId });
+
+        const response = await API.get(`/invoices/customer/${customerId}`).send();
+
         expect(response.status).toBe(HttpStatus.OK);
     });
 });
@@ -74,62 +71,76 @@ describe("GET /invoices/customer/:id", () => {
 describe("POST /invoices", () => {
     test("BAD REQUEST, cuando el body es vacio", async () => {
         const response = await API.post(`/invoices`).send({});
+
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
     test("BAD REQUEST, cuando no hay compras o items en el body", async () => {
-        const customerIdFeik = generateId();
+        const { _id: customerId } = await createCustomer();
         const invoiceRequest = {
             description: "description",
-            customerId: customerIdFeik,
+            customerId,
             invoiceItems: [],
         };
+
         const response = await API.post(`/invoices`).send(invoiceRequest);
+
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     test("BAD REQUEST, cuando NO hay cliente en el body", async () => {
+        const { _id: productId } = await createProduct();
         const invoiceRequest = {
             description: "description",
             invoiceItems: [
                 {
-                    productId: "62b635f44fcd649e90e1934b",
+                    productId,
                     quantity: 2,
                 },
             ],
         };
+
         const response = await API.post(`/invoices`).send(invoiceRequest);
+
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
     test("NOT FOUND, cuando el cliente no existe ", async () => {
+        const { _id: productId } = await createProduct();
         const invoiceRequest = {
             description: "description",
             customerId: "no existo :(",
             invoiceItems: [
                 {
-                    productId: "62b635f44fcd649e90e1934b",
+                    productId,
                     quantity: 2,
                 },
             ],
         };
+
         const response = await API.post(`/invoices`).send(invoiceRequest);
+
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     test("CREATED, cuando el cliente existe y hay al menos una compra en el body", async () => {
-        const customerIdFeik = await createCustomer();
-        const productIdFeik = await createProduct();
+        const [_, { _id: customerId }, { _id: productId }] = await Promise.all([
+            invoiceItemRepo.deleteMany(),
+            createCustomer(),
+            createProduct(),
+        ]);
         const invoiceRequest = {
             description: "description",
-            customerId: customerIdFeik._id,
+            customerId,
             invoiceItems: [
                 {
-                    productId: productIdFeik._id,
+                    productId,
                     quantity: 2,
                 },
             ],
         };
+
         const response = await API.post(`/invoices`).send(invoiceRequest);
+
         expect(response.status).toBe(HttpStatus.CREATED);
     });
 });
