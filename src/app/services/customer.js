@@ -48,8 +48,12 @@ module.exports = {
         }
     },
     deleteById: async (id) => {
-        const customerDB = await customerRepo.findByIdAndDelete(id);
-        return customerDB;
+        try {
+            const customerDB = await customerRepo.findByIdAndDelete(id);
+            return customerDB;
+        } catch (e) {
+            throw HttpError(HttpStatus.NOT_FOUND, e.message);
+        }
     },
 
     findAll: async () => await customerRepo.find({}),

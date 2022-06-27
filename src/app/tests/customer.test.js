@@ -144,14 +144,13 @@ describe("POST /customers/regions", () => {
 
 describe("DELETE /customers/:id", () => {
     test("NOT FOUND, cuando el id no existe", async () => {
-        const name = "Ya existo";
-        await customerRepo.create({ name });
-        const response = await API.post("/categories").send({ name });
-        expect(response.status).toBe(HttpStatus.CONFLICT);
+        const response = await API.delete("/customers/123").send();
+        expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     test("OK, cuando hay se elimina con exito", async () => {
-        const response = await API.post("/categories").send({});
+        const id = customersDB[0].id;
+        const response = await API.delete(`/customers/${id}`).send();
         expect(response.status).toBe(HttpStatus.OK);
     });
 });
