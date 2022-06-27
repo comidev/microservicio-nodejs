@@ -3,7 +3,12 @@ const categoryService = require("../services/category");
 const productRepo = require("./model/mongodb/product");
 
 const findById = async (id) => {
-    const productDB = await productRepo.findById(id);
+    let productDB = null;
+    try {
+        productDB = await productRepo.findById(id);
+    } catch (e) {
+        throw HttpError(HttpStatus.NOT_FOUND, e.message);
+    }
     if (!productDB) {
         const message = `Producto no encontrado: ${id}`;
         throw HttpError(HttpStatus.NOT_FOUND, message);

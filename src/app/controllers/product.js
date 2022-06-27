@@ -32,6 +32,7 @@ module.exports = {
     findAll: async (req, res, next) => {
         try {
             const productsDB = await productService.findAll();
+            res.status(productsDB.length === 0 ? 204 : 200);
             res.send(productsDB);
         } catch (error) {
             next(error);

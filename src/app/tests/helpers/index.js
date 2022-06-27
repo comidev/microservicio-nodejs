@@ -1,12 +1,16 @@
 const shortUUID = require("short-uuid");
+const mongoose = require("mongoose");
 const roleRepo = require("../../services/model/mongodb/role");
 const userRepo = require("../../services/model/mongodb/user");
+const passwordService = require("../../utils/password");
 const customerRepo = require("../../services/model/mongodb/customer");
 const invoiceRepo = require("../../services/model/mongodb/invoice");
 const invoiceItemRepo = require("../../services/model/mongodb/invoiceItem");
 const regionRepo = require("../../services/model/mongodb/region");
 const productRepo = require("../../services/model/mongodb/product");
 const categoryRepo = require("../../services/model/mongodb/category");
+
+const generateId = () => mongoose.Types.ObjectId();
 
 const createRole = async (roleName = "CLIENTE") => {
     const role = { name: roleName };
@@ -15,13 +19,15 @@ const createRole = async (roleName = "CLIENTE") => {
 };
 
 const createUser = async (role) => {
+    const password = "123";
+    const passwordHash = await passwordService.encrypt(password);
     const user = {
         username: shortUUID().generate(),
-        password: 123,
-        roles: [role._id],
+        password: passwordHash,
+        roles: [role?._id || generateId()],
     };
-    const { _id } = await userRepo.create(user);
-    return { _id };
+    const { _id, username } = await userRepo.create(user);
+    return { _id, username, password };
 };
 
 const createRegion = async (regionName = "region") => {
@@ -38,8 +44,8 @@ const createCustomer = async (user, region) => {
         email: shortUUID().generate(),
         photoUrl: "none",
         state: "CREATED",
-        user: user._id,
-        region: region._id,
+        user: user?._id || generateId(),
+        region: region?._id || generateId(),
     };
     const { _id } = await customerRepo.create(customer);
     return { _id };
@@ -47,10 +53,10 @@ const createCustomer = async (user, region) => {
 
 const createCategory = async (categoryName = "Programacion") => {
     const categoria = { name: categoryName };
-    const { _id } =
+    const { _id, name } =
         (await categoryRepo.findOne(categoria)) ||
         (await categoryRepo.create(categoria));
-    return { _id };
+    return { _id, name };
 };
 
 const createProduct = async (category) => {
@@ -60,7 +66,7 @@ const createProduct = async (category) => {
         stock: 100,
         price: 100.51,
         status: "CREATED",
-        category: category._id,
+        category: category?._id || generateId(),
     };
     const { _id } = await productRepo.create(product);
     return { _id };
@@ -90,10 +96,10 @@ const arrayLengthAndMap = (length, map) => [...Array(length).keys()].map(map);
 
 // TODO: 3 clientes compran 1 producto cada uno.
 const USERS_LENGTH = 3;
-const CUSTOMERS_LENGTH = 3; // ? Debe ser menor o igual a USERS
+const CUSTOMERS_LENGTH = 3; // ? <= USERS
 const PRODUCTS_LENGTH = 3;
-const INVOICE_ITEMS_LENGTH = 3; // ? Deb ser menor o igual a USERS x PRODUCTS!!!
-const INVOICE_LENGTH = 3; // ? Debe ser menor o igual a INVOICES ITEMS
+const INVOICE_ITEMS_LENGTH = 3; // ? <= USERS x PRODUCTS!!!
+const INVOICE_LENGTH = 3; // ? <= INVOICES ITEMS
 
 // * USERS ----
 const initUsers = async () => {
@@ -164,7 +170,9 @@ const initInvoices = async () => {
 module.exports = {
     createCustomer,
     createInvoice,
+    createProduct,
     createRole,
     createUser,
+    createCategory,
     initInvoices,
 };

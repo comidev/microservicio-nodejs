@@ -11,6 +11,12 @@ module.exports = {
         }
 
         const items = invoice.invoiceItems;
+        if (!items || items.length === 0) {
+            throw HttpError(
+                HttpStatus.BAD_REQUEST,
+                `Debe haber al menos una compra (invoice item)`
+            );
+        }
 
         for (const item of items) {
             const { productId, quantity } = item;
@@ -38,9 +44,14 @@ module.exports = {
     findAll: async () => await invoiceRepo.find({}),
 
     findById: async (id) => {
-        const invoiceDB = await invoiceRepo
-            .findById(id)
-            .populate(["customer", "invoiceItems"]);
+        let invoiceDB = null;
+        try {
+            invoiceDB = await invoiceRepo
+                .findById(id)
+                .populate(["customer", "invoiceItems"]);
+        } catch (e) {
+            throw HttpError(HttpStatus.NOT_FOUND, e.message);
+        }
         if (!invoiceDB) {
             const message = `La compra con este id no existe :(`;
             throw HttpError(HttpStatus.NOT_FOUND, message);
@@ -48,9 +59,14 @@ module.exports = {
         return invoiceDB;
     },
     findByCustomerId: async (id) => {
-        const invoicesDB = await invoiceRepo
-            .find({ customer: id })
-            .populate(["customer", "invoiceItems"]);
+        let invoicesDB = null;
+        try {
+            invoicesDB = await invoiceRepo
+                .find({ customer: id })
+                .populate(["customer", "invoiceItems"]);
+        } catch (e) {
+            throw HttpError(HttpStatus.NOT_FOUND, e.message);
+        }
         if (!invoicesDB) {
             const message = `El cliente no tiene compras :(`;
             throw HttpError(HttpStatus.NOT_FOUND, message);

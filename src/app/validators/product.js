@@ -5,6 +5,7 @@ const saveProduct = [
     check(["categoryName", "name", "description", "stock", "price"])
         .exists()
         .notEmpty(),
+    check(["stock", "price"]).isNumeric(),
     validateResults,
 ];
 

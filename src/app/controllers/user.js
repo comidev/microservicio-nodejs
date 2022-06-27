@@ -24,7 +24,7 @@ module.exports = {
     findAll: async (req, res, next) => {
         try {
             const usersDB = await userService.findAll();
-            res.status(200);
+            res.status(usersDB.length === 0 ? 204 : 200);
             res.send(usersDB);
         } catch (error) {
             next(error);

@@ -10,10 +10,19 @@ const roleRepo = require("./model/mongodb/role");
 const findByUsername = async (username) =>
     await userRepo.findOne({ username: username });
 
+const hasEmptySpaces = (string = "") => {
+    return string.includes(" ");
+};
+
 const saveUserWithRole = async (user, roleName) => {
-    const username = user.username;
-    if (await findByUsername(username)) {
-        const message = `El username '${username}' ya existe!`;
+    const { username: usernameReq, password: passwordReq } = user;
+    if (hasEmptySpaces(usernameReq) || hasEmptySpaces(passwordReq)) {
+        const message = `El username y/o password presentan espacios vacios!`;
+        throw HttpError(HttpStatus.BAD_REQUEST, message);
+    }
+
+    if (await findByUsername(usernameReq)) {
+        const message = `El username '${usernameReq}' ya existe!`;
         throw HttpError(HttpStatus.CONFLICT, message);
     }
 
@@ -21,10 +30,10 @@ const saveUserWithRole = async (user, roleName) => {
         (await roleRepo.findOne({ name: roleName })) ||
         (await roleRepo.create({ name: roleName }));
 
-    const password = await passwordService.encrypt(user.password);
+    const password = await passwordService.encrypt(passwordReq);
 
     return await userRepo.create({
-        username: username,
+        username: usernameReq,
         password: password,
         roles: [{ _id: role._id }],
     });
@@ -32,19 +41,25 @@ const saveUserWithRole = async (user, roleName) => {
 
 module.exports = {
     login: async (user) => {
-        const userDB = await findByUsername(user.username);
+        const { username: usernameReq, password: passwordReq } = user;
+        if (hasEmptySpaces(usernameReq) || hasEmptySpaces(passwordReq)) {
+            const message = `El username y/o password presentan espacios vacios!`;
+            throw HttpError(HttpStatus.BAD_REQUEST, message);
+        }
+
+        const userDB = await findByUsername(usernameReq);
         if (!userDB) {
-            const message = `Username '${user.username}' o password incorrecto!`;
+            const message = `Username o password incorrecto!`;
             throw HttpError(HttpStatus.FORBBIDEN, message);
         }
 
         const passwordIsCorrect = await passwordService.comparePlainWithEncrypted(
-            user.password,
+            passwordReq,
             userDB.password
         );
 
         if (!passwordIsCorrect) {
-            const message = `Username '${user.username}' o password incorrecto!`;
+            const message = `Username o Password ${passwordReq} DB: ${userDB.password} incorrecto!`;
             throw HttpError(HttpStatus.FORBBIDEN, message);
         }
 
@@ -69,14 +84,19 @@ module.exports = {
         await userRepo.find({}).populate("roles", { name: 1, _id: 0 }),
 
     findById: async (id) => {
-        const userDB = await userRepo.findById(id);
+        let userDB;
+        try {
+            userDB = await userRepo.findById(id);
+        } catch (e) {
+            throw HttpError(HttpStatus.NOT_FOUND, e.message);
+        }
         if (!userDB) {
             throw HttpError(HttpStatus.NOT_FOUND, `User no encontrado!`);
         }
         return userDB;
     },
     tokenRefresh: (tokenRefresh) => {
-        const payload = jwtService.verify(tokenRefresh);
-        return jwtService.createTokens(payload);
+        const { id, username, roles } = jwtService.verify(tokenRefresh);
+        return jwtService.createTokens({ id, username, roles });
     },
 };

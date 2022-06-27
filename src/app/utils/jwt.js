@@ -42,4 +42,4 @@ const verify = (bearerToken = "") => {
     }
 };
 
-module.exports = { createTokens, verify };
+module.exports = { createTokens, verify, isBearer };

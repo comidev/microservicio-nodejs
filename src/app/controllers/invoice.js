@@ -34,7 +34,7 @@ module.exports = {
         try {
             const { id } = req.params;
             const invoicesDB = await invoiceService.findByCustomerId(id);
-            res.status(200);
+            res.status(invoicesDB.length === 0 ? 204 : 200);
             res.send(invoicesDB);
         } catch (error) {
             next(error);
