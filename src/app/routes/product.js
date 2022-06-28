@@ -5,7 +5,7 @@ const handleToken = require("../middleware/handleToken");
 const controller = require("../controllers/product");
 const validator = require("../validators/product");
 
-router.get("", controller.findAll);
+router.get("", controller.findAllOrByCategoryName);
 router.get("/:id", controller.findById);
 // TODO: AUTENTICADO!
 router.post("", validator.saveProduct, handleToken, controller.save);

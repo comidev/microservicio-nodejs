@@ -1,18 +1,18 @@
-### Devuelve todas las compras  | TOKEN  | ROL: ADMIN
+### ? Devuelve todas las compras  | TOKEN  | ROL: ADMIN
 GET http://localhost:3000/invoices
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4
 
 
-### Devuelve una compra según el /id | TOKEN
+### ? Devuelve una compra según el /id | TOKEN
 GET http://localhost:3000/invoices/62b63515c9a8a590e014cd0f
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4
 
-### Devuelve las compras de un cliente segun su id | TOKEN
+### ? Devuelve las compras de un cliente segun su id | TOKEN
 GET http://localhost:3000/invoices/customer/62b63515c9a8a590e014cd0f
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4
 
 
-### Guardar una compra | TOKEN  | ROL: CLIENTE
+### ? Guardar una compra | TOKEN  | ROL: CLIENTE
 POST http://localhost:3000/invoices
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4

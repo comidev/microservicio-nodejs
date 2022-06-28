@@ -1,5 +1,4 @@
 const { model, Schema } = require("mongoose");
-const STATUS = require("../../../utils/status");
 
 const ProductScheme = new Schema(
     {
@@ -8,10 +7,12 @@ const ProductScheme = new Schema(
         stock: Number,
         price: Number,
         status: String,
-        category: {
-            type: Schema.Types.ObjectId,
-            ref: "categories",
-        },
+        categories: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "categories",
+            },
+        ],
     },
     {
         timestamps: true,

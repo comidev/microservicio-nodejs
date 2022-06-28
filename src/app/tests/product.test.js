@@ -26,6 +26,35 @@ describe("GET /products", () => {
     });
 });
 
+describe("GET /products?categoryName", () => {
+    test("NOT FOUND, el nombre de categoria no existe", async () => {
+        const response = await API.get(`/products?categoryName=No existo uu`).send();
+
+        expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+
+    test("NO CONTENT, cuando la categoria no tiene productos", async () => {
+        const { name: catengoryName } = await createCategory();
+
+        const response = await API.get(
+            `/products?categoryName=${catengoryName}`
+        ).send();
+
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    test("OK, cuando la categoria tiene al menos un producto", async () => {
+        const { _id: categoryId, name: categoryName } = await createCategory();
+        await createProduct({ categoriesId: [categoryId] });
+
+        const response = await API.get(
+            `/products?categoryName=${categoryName}`
+        ).send();
+
+        expect(response.status).toBe(HttpStatus.OK);
+    });
+});
+
 describe("GET /products/:id", () => {
     test("NOT FOUND, cuando el id es incorrecto", async () => {
         const response = await API.get(`/products/123`).send();
@@ -60,7 +89,7 @@ describe("POST /products", () => {
 
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
-    test("BAD REQUEST, cuando NO hay categoria en el body", async () => {
+    test("BAD REQUEST, cuando NO hay categorias en el body", async () => {
         const productRequest = {
             name: "Producto n-esimo",
             description: "Producto productero",
@@ -73,13 +102,13 @@ describe("POST /products", () => {
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
-    test("NOT FOUND, cuando la categoria no existe ", async () => {
+    test("NOT FOUND, cuando al menos una categoria no existe ", async () => {
         const productRequest = {
             name: "Producto n-esimo",
             description: "Producto productero",
             stock: 100,
             price: 150.5,
-            categoryName: "no existo :(",
+            categories: ["no existo :(", "yo tampoco u-u"],
         };
 
         const response = await API.post(`/products`).send(productRequest);
@@ -87,14 +116,15 @@ describe("POST /products", () => {
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
-    test("CREATED, cuando los campos no son vacios y la categoria existe", async () => {
-        const { name: categoryName } = await createCategory();
+    test("CREATED, cuando los campos no son vacios y las categorias existen", async () => {
+        const { name: categoryName1 } = await createCategory();
+        const { name: categoryName2 } = await createCategory();
         const productRequest = {
             name: "Producto n-esimo",
             description: "Producto productero",
             stock: 100,
             price: 150.5,
-            categoryName,
+            categories: [categoryName1, categoryName2],
         };
 
         const response = await API.post(`/products`).send(productRequest);

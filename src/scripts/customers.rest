@@ -1,12 +1,12 @@
-### Devuelve todas los CLIENTES | TOKEN  | ROL: ADMIN
+### ? Devuelve todas los CLIENTES | TOKEN  | ROL: ADMIN
 GET http://localhost:3000/customers
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4
 
-### Devuelve un CLIENTE según el /id | TOKEN  | ROL: CLIENTE
+### ? Devuelve un CLIENTE según el /id | TOKEN  | ROL: CLIENTE
 GET http://localhost:3000/customers/62b63515c9a8a590e014cd0f
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4
 
-### Guardar un CLIENTE
+### ? Guardar un CLIENTE
 POST http://localhost:3000/customers
 Content-Type: application/json
 
@@ -22,7 +22,7 @@ Content-Type: application/json
     "regionName" : "Gorgor"
 }
 
-### Guarda una REGION  | TOKEN  | ROL: ADMIN
+### ? Guarda una REGION  | TOKEN  | ROL: ADMIN
 POST http://localhost:3000/customers/regions
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4
@@ -31,6 +31,6 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyO
    "name" : "Gorgor"
 }
 
-### Elimina un CLIENTE por ID | TOKEN  | ROL: ADMIN, CLIENTE
+### ? Elimina un CLIENTE por ID | TOKEN  | ROL: ADMIN, CLIENTE
 DELETE  http://localhost:3000/customers/62b63515c9a8a590e014cd0f
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4

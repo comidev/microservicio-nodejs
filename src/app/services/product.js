@@ -18,7 +18,12 @@ const findById = async (id) => {
 
 module.exports = {
     save: async (product) => {
-        const category = await categoryService.findByName(product.categoryName);
+        const categories = [];
+
+        for (const categoryName of product.categories) {
+            const categoryDB = await categoryService.findByName(categoryName);
+            categories.push(categoryDB._id);
+        }
 
         const productModel = new productRepo({
             name: product.name,
@@ -26,7 +31,7 @@ module.exports = {
             stock: product.stock,
             price: product.price,
             status: "CREATED",
-            category,
+            categories,
         });
 
         const productDB = await productModel.save();
@@ -36,11 +41,17 @@ module.exports = {
         const productDB = await productRepo.findByIdAndDelete(id);
         return productDB;
     },
-    findAll: async () => {
-        const productsDB = await productRepo
+    findAllOrByCategoryName: async (categoryName) => {
+        if (categoryName) {
+            const category = await categoryService.findByName(categoryName);
+
+            return await productRepo
+                .find({ categories: category })
+                .populate("categories", { _id: 0, name: 1 });
+        }
+        return await productRepo
             .find({})
-            .populate("category", { _id: 0, name: 1 });
-        return productsDB;
+            .populate("categories", { _id: 0, name: 1 });
     },
     updateStock: async (id, quantity) => {
         const productDB = await findById(id);

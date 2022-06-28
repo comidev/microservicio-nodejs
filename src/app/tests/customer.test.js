@@ -2,9 +2,10 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
-const customerRepo = require("../services/model/mongodb/customer");
-const regionRepo = require("../services/model/mongodb/region");
 const { createCustomer, createUser, createRegion } = require("./helpers/index");
+const regionRepo = require("../services/model/mongodb/region");
+const customerRepo = require("../services/model/mongodb/customer");
+
 const API = supertest(app);
 
 beforeEach(async () => {
@@ -14,7 +15,6 @@ beforeEach(async () => {
 describe("GET /customers", () => {
     test("NO CONTENT, cuando no hay clientes", async () => {
         const response = await API.get(`/customers`).send();
-
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
 

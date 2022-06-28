@@ -29,9 +29,12 @@ module.exports = {
             next(error);
         }
     },
-    findAll: async (req, res, next) => {
+    findAllOrByCategoryName: async (req, res, next) => {
         try {
-            const productsDB = await productService.findAll();
+            const { categoryName } = req.query;
+            const productsDB = await productService.findAllOrByCategoryName(
+                categoryName
+            );
             res.status(productsDB.length === 0 ? 204 : 200);
             res.send(productsDB);
         } catch (error) {

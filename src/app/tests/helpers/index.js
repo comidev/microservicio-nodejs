@@ -76,7 +76,7 @@ const createCategory = async (
 
 // TODO: PRODUCT
 const createProduct = async (
-    { categoryId = generateId() } = { categoryId: generateId() }
+    { categoriesId = [generateId()] } = { categoriesId: [generateId()] }
 ) => {
     const product = {
         name: "name",
@@ -84,7 +84,7 @@ const createProduct = async (
         stock: 100,
         price: 100.51,
         status: "CREATED",
-        category: categoryId,
+        categories: categoriesId,
     };
     const { _id } = await productRepo.create(product);
     return { _id };
