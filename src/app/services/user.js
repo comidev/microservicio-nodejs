@@ -10,7 +10,7 @@ const roleRepo = require("./model/mongodb/role");
 const findByUsername = async (username) =>
     await userRepo.findOne({ username: username });
 
-const hasEmptySpaces = (string = "") => {
+const hasEmptySpaces = (string) => {
     return string.includes(" ");
 };
 
@@ -74,6 +74,11 @@ module.exports = {
             username: userDB.username,
             roles: rolesDB,
         });
+    },
+
+    existsUsername: async (username) => {
+        const exists = Boolean(await findByUsername(username));
+        return { exists };
     },
 
     saveCliente: async (user) => await saveUserWithRole(user, ROLES.CLIENTE),

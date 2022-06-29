@@ -21,11 +21,30 @@ module.exports = {
             next(error);
         }
     },
+    existsEmail: async (req, res, next) => {
+        try {
+            const { email } = req.body;
+            const exists = await customerService.existsEmail(email);
+            res.status(200);
+            res.send(exists);
+        } catch (error) {
+            next(error);
+        }
+    },
     findAll: async (req, res, next) => {
         try {
             const customersDB = await customerService.findAll();
             res.status(customersDB.length === 0 ? 204 : 200);
             res.send(customersDB);
+        } catch (error) {
+            next(error);
+        }
+    },
+    findAllCountries: async (req, res, next) => {
+        try {
+            const countriesDB = await customerService.findAllCountries();
+            res.status(countriesDB.length === 0 ? 204 : 200);
+            res.send(countriesDB);
         } catch (error) {
             next(error);
         }
@@ -36,16 +55,6 @@ module.exports = {
             const customerDB = await customerService.findById(id);
             res.status(200);
             res.send(customerDB);
-        } catch (error) {
-            next(error);
-        }
-    },
-    saveRegion: async (req, res, next) => {
-        try {
-            const { name } = req.body;
-            const regionDB = await customerService.saveRegion(name);
-            res.status(201);
-            res.send(regionDB);
         } catch (error) {
             next(error);
         }

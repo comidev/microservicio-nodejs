@@ -2,8 +2,9 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
-const { createCustomer, createUser, createRegion } = require("./helpers/index");
-const regionRepo = require("../services/model/mongodb/region");
+const GENDERS = require("../utils/genders");
+const { createCustomer, createUser, createCountry } = require("./helpers/index");
+const countryRepo = require("../services/model/mongodb/country");
 const customerRepo = require("../services/model/mongodb/customer");
 
 const API = supertest(app);
@@ -14,7 +15,10 @@ beforeEach(async () => {
 
 describe("GET /customers", () => {
     test("NO CONTENT, cuando no hay clientes", async () => {
+        await customerRepo.deleteMany();
+
         const response = await API.get(`/customers`).send();
+
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
 
@@ -56,13 +60,15 @@ describe("POST /customers", () => {
         const customerRequest = {
             dni,
             name: "comidev",
+            gender: GENDERS.MALE,
+            dateOfBirth: new Date(2000, 3, 11),
             email,
             photoUrl: "none",
             user: {
                 username: "cesar",
                 password: "123",
             },
-            regionName: "Region",
+            countryName: "Perú",
         };
 
         const response = await API.post(`/customers/`).send(customerRequest);
@@ -71,19 +77,21 @@ describe("POST /customers", () => {
     });
 
     test("CONFLICT, cuando algun username es repetido pero debe ser unico", async () => {
-        const { name: regionName } = await createRegion();
+        const { name: countryName } = await createCountry();
         const { _id, username } = await createUser();
         await createCustomer({ userId: _id });
         const customerRequest = {
             dni: "87654321",
             name: "comidev",
             email: "email@email.com",
+            gender: GENDERS.MALE,
+            dateOfBirth: new Date(2000, 3, 11),
             photoUrl: "none",
             user: {
                 username,
                 password: "123",
             },
-            regionName,
+            countryName,
         };
 
         const response = await API.post(`/customers/`).send(customerRequest);
@@ -91,17 +99,19 @@ describe("POST /customers", () => {
         expect(response.status).toBe(HttpStatus.CONFLICT);
     });
 
-    test("NOT FOUND, cuando la region no existe", async () => {
+    test("NOT FOUND, cuando el país no existe", async () => {
         const customerRequest = {
             dni: "87654321",
             name: "comidev",
             email: "email@email.com",
+            gender: GENDERS.MALE,
+            dateOfBirth: new Date(2000, 3, 11),
             photoUrl: "none",
             user: {
                 username: "username",
                 password: "123",
             },
-            regionName: "No existo u_u",
+            countryName: "No existo u_u",
         };
 
         const response = await API.post(`/customers/`).send(customerRequest);
@@ -110,48 +120,43 @@ describe("POST /customers", () => {
     });
 
     test("CREATED, cuando los campos son correctos", async () => {
-        const { name: regionName } = await createRegion();
+        const { name: countryName } = await createCountry();
 
         const customerRequest = {
             dni: "87654321",
             name: "comidev",
+            gender: GENDERS.MALE,
+            dateOfBirth: new Date(2000, 3, 11),
             email: "email@email.com",
             photoUrl: "none",
             user: {
                 username: "username",
                 password: "123",
             },
-            regionName,
+            countryName,
         };
 
         const response = await API.post(`/customers/`).send(customerRequest);
-
+        
         expect(response.status).toBe(HttpStatus.CREATED);
     });
 });
 
-describe("POST /customers/regions", () => {
-    test("CONFLICT, cuando el 'name' ya existe", async () => {
-        const { name } = await createRegion();
+describe("GET /customers/countries", () => {
+    test("NO CONTENT, cuando no hay ningun pais", async () => {
+        await countryRepo.deleteMany();
 
-        const response = await API.post("/customers/regions").send({ name });
+        const response = await API.get("/customers/countries").send();
 
-        expect(response.status).toBe(HttpStatus.CONFLICT);
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
 
-    test("BAD REQUEST, cuando no hay 'name'", async () => {
-        const response = await API.post("/customers/regions").send({});
+    test("OK, cuando hay al menos una país", async () => {
+        await createCountry();
 
-        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    });
+        const response = await API.get("/customers/countries").send({});
 
-    test("CREATED, cuando 'name' es nuevo", async () => {
-        await regionRepo.deleteMany();
-        const name = "Soy una nueva categoria";
-
-        const response = await API.post("/customers/regions").send({ name });
-
-        expect(response.status).toBe(HttpStatus.CREATED);
+        expect(response.status).toBe(HttpStatus.OK);
     });
 });
 
@@ -168,6 +173,39 @@ describe("DELETE /customers/:id", () => {
         const response = await API.delete(`/customers/${_id}`).send();
 
         expect(response.status).toBe(HttpStatus.OK);
+    });
+});
+
+describe("POST /customers/validate/email", () => {
+    test("BAD REQUEST, cuando el body esta vacio", async () => {
+        const response = await API.post(`/customers/validate/email`).send({});
+
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
+    test("OK, true, cuando el email es correcto y existe", async () => {
+        const { email } = await createCustomer();
+        const customerRequest = { email };
+
+        const response = await API.post(`/customers/validate/email`).send(
+            customerRequest
+        );
+
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body.exists).toBeDefined();
+        expect(response.body.exists).toBeTruthy();
+    });
+
+    test("OK, false, cuando el email es correcto y NO existe", async () => {
+        const customerRequest = { email: "unnuevo@email.comxd" };
+
+        const response = await API.post(`/customers/validate/email`).send(
+            customerRequest
+        );
+
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body.exists).toBeDefined();
+        expect(response.body.exists).toBeFalsy();
     });
 });
 

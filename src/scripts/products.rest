@@ -2,9 +2,11 @@
 GET http://localhost:3000/products
 
 
-### ? Devuelve todas los productos por nombre de categoria
+### ? Devuelve todas los productos por nombre de
+#   ? categoria y/o nombre de producto
 GET http://localhost:3000/products
     ?categoryName=Adulto
+    &name=Inca
 
 
 ### ? Devuelve un producto según el /id
@@ -22,6 +24,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyO
 
 {
     "name": "Producto n05",
+    "photoUrl" :"httpxd",
     "description": "Producto productero",
     "stock": 100,
     "price": 150.5,

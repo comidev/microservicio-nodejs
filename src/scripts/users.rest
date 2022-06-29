@@ -28,6 +28,14 @@ Content-Type: application/json
     "password" : "admin"
 }
 
+### ? Existe username (obtiene boolean)
+POST http://localhost:3000/users/validate/username
+Content-Type: application/json
+
+{
+    "username" : "existo?"
+}
+
 
 ### ? Token refresh (obtiene jwt por Token refresh) | TOKEN-REFRESH
 POST http://localhost:3000/users/token/refresh

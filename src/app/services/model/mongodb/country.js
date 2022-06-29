@@ -1,6 +1,6 @@
 const { model, Schema } = require("mongoose");
 
-const RegionSchema = new Schema(
+const CountrySchema = new Schema(
     {
         name: {
             type: String,
@@ -12,6 +12,6 @@ const RegionSchema = new Schema(
     }
 );
 
-const RegionModel = model("regions", RegionSchema);
+const CountryModel = model("countries", CountrySchema);
 
-module.exports = RegionModel;
+module.exports = CountryModel;

@@ -11,6 +11,12 @@ const controller = require("../controllers/user");
 router.post("/login", validator.saveAdminOrLogin, controller.login);
 // TODO: TODOS
 router.post("/token/refresh", controller.tokenRefresh);
+// TODO: TODOS
+router.post(
+    "/validate/username",
+    validator.existsUsername,
+    controller.existsUsername
+);
 
 // TODO: SOLO ADMINS
 router.get("", handleToken, handleRoles(ROLES.ADMIN), controller.findAll);

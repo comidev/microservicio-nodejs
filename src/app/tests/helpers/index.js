@@ -7,7 +7,7 @@ const roleRepo = require("../../services/model/mongodb/role");
 const customerRepo = require("../../services/model/mongodb/customer");
 const invoiceRepo = require("../../services/model/mongodb/invoice");
 const invoiceItemRepo = require("../../services/model/mongodb/invoiceItem");
-const regionRepo = require("../../services/model/mongodb/region");
+const countryRepo = require("../../services/model/mongodb/country");
 const productRepo = require("../../services/model/mongodb/product");
 const categoryRepo = require("../../services/model/mongodb/category");
 
@@ -33,21 +33,19 @@ const createUser = async ({ role = generateId() } = { role: generateId() }) => {
     return { _id, username, password };
 };
 
-// TODO: REGION
-const createRegion = async (
-    { regionName = "region" } = { regionName: "region" }
-) => {
-    const region = { name: regionName };
+// TODO: COUNTRY
+const createCountry = async ({ countryName = "País" } = { countryName: "País" }) => {
+    const country = { name: countryName };
     const { _id, name } =
-        (await regionRepo.findOne(region)) || (await regionRepo.create(region));
+        (await countryRepo.findOne(country)) || (await countryRepo.create(country));
     return { _id, name };
 };
 
 // TODO: CUSTOMER
 const createCustomer = async (
-    { userId = generateId(), regionId = generateId() } = {
+    { userId = generateId(), countryId = generateId() } = {
         userId: generateId(),
-        regionId: generateId(),
+        countryId: generateId(),
     }
 ) => {
     const customer = {
@@ -55,9 +53,11 @@ const createCustomer = async (
         name: "Omar",
         email: shortUUID().generate(),
         photoUrl: "none",
+        gender: "Masculino",
+        dateOfBirth: new Date(2000, 3, 11),
         state: "CREATED",
         user: userId,
-        region: regionId,
+        country: countryId,
     };
     const { _id, name, dni, email } = await customerRepo.create(customer);
     return { _id, name, dni, email };
@@ -80,14 +80,15 @@ const createProduct = async (
 ) => {
     const product = {
         name: "name",
+        photoUrl: "xdd",
         description: "description",
         stock: 100,
         price: 100.51,
         status: "CREATED",
         categories: categoriesId,
     };
-    const { _id } = await productRepo.create(product);
-    return { _id };
+    const { _id, name } = await productRepo.create(product);
+    return { _id, name };
 };
 
 // TODO: INVOICE ITEM
@@ -125,7 +126,7 @@ module.exports = {
     createProduct,
     createRole,
     createUser,
-    createRegion,
+    createCountry,
     createCategory,
     createInvoiceItem,
 };

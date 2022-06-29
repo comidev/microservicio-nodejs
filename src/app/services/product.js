@@ -27,6 +27,7 @@ module.exports = {
 
         const productModel = new productRepo({
             name: product.name,
+            photoUrl: product.photoUrl,
             description: product.description,
             stock: product.stock,
             price: product.price,
@@ -41,25 +42,20 @@ module.exports = {
         const productDB = await productRepo.findByIdAndDelete(id);
         return productDB;
     },
-    findAllOrByCategoryName: async (categoryName) => {
+    findAllOrFields: async (categoryName, name) => {
+        let filter = {};
         if (categoryName) {
             const category = await categoryService.findByName(categoryName);
-
-            return await productRepo
-                .find({ categories: category })
-                .populate("categories", { _id: 0, name: 1 });
+            filter.categories = category;
         }
-        return await productRepo
-            .find({})
-            .populate("categories", { _id: 0, name: 1 });
+        if (name) {
+            filter.name = [name];
+        }
+        return await productRepo.find(filter);
     },
     updateStock: async (id, quantity) => {
         const productDB = await findById(id);
-        const newQuantity = productDB.stock - quantity;
-        if (newQuantity < 0) {
-            const message = `Stock menor a cero: ${id} | ${quantity} !`;
-            throw HttpError(HttpStatus.NOT_ACCEPTABLE, message);
-        }
+        const newQuantity = productDB.stock + quantity;
         await productRepo.findByIdAndUpdate(id, { stock: newQuantity });
     },
     findById,

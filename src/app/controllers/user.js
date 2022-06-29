@@ -40,6 +40,16 @@ module.exports = {
             next(error);
         }
     },
+    existsUsername: async (req, res, next) => {
+        try {
+            const { username } = req.body;
+            const exists = await userService.existsUsername(username);
+            res.status(200);
+            res.send(exists);
+        } catch (error) {
+            next(error);
+        }
+    },
     tokenRefresh: (req, res, next) => {
         try {
             const authorization = req.get("authorization");

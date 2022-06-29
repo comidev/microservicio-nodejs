@@ -14,6 +14,8 @@ beforeEach(async () => {
 
 describe("GET /users", () => {
     test("NO CONTENT, cuando no hay usuarios", async () => {
+        await userRepo.deleteMany();
+
         const response = await API.get(`/users`).send();
 
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
@@ -207,6 +209,47 @@ describe("POST /users/token/refresh", () => {
             jwtService.isBearer(`Bearer ${access_token}`) &&
             jwtService.isBearer(`Bearer ${refresh_tokenRes}`);
         expect(isBearer).toBe(true);
+    });
+});
+
+describe("POST /users/validate/username", () => {
+    test("BAD REQUEST, cuando el body esta vacio", async () => {
+        const response = await API.post(`/users/validate/username`).send({});
+
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
+    test("BAD REQUEST, cuando el username menr a 3 length", async () => {
+        const response = await API.post(`/users/validate/username`).send({
+            username: "12",
+        });
+
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
+    test("OK, true, cuando el username es correcto y existe", async () => {
+        const { username } = await createUser();
+        const userRequest = { username };
+
+        const response = await API.post(`/users/validate/username`).send(
+            userRequest
+        );
+
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body.exists).toBeDefined();
+        expect(response.body.exists).toBeTruthy();
+    });
+
+    test("OK, false, cuando el useranme es correcto y NO existe", async () => {
+        const userRequest = { username: "usernameQueNoExiste" };
+
+        const response = await API.post(`/users/validate/username`).send(
+            userRequest
+        );
+
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body.exists).toBeDefined();
+        expect(response.body.exists).toBeFalsy();
     });
 });
 

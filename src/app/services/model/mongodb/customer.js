@@ -6,6 +6,8 @@ const CustomerSchema = new Schema({
         unique: true,
     },
     name: String,
+    dateOfBirth: Date,
+    gender: String,
     email: {
         type: String,
         unique: true,
@@ -16,9 +18,9 @@ const CustomerSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "users",
     },
-    region: {
+    country: {
         type: Schema.Types.ObjectId,
-        ref: "regions",
+        ref: "countries",
     },
 });
 

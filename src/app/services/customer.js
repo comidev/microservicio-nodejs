@@ -1,14 +1,22 @@
 const { HttpStatus, HttpError } = require("../middleware/handleError");
 const customerRepo = require("./model/mongodb/customer");
-const regionRepo = require("./model/mongodb/region");
+const countryRepo = require("./model/mongodb/country");
 const userService = require("./user");
+const GENDERS = require("../utils/genders");
 
 const existsByDni = async (dni) => await customerRepo.findOne({ dni: dni });
 
-const existsByEmail = async (email) => await customerRepo.findOne({ email: email });
+const existsByEmail = async (email) => {
+    return await customerRepo.findOne({ email: email });
+};
 
 module.exports = {
     save: async (customer) => {
+        if (!Object.values(GENDERS).includes(customer.gender)) {
+            const message = `El género '${customer.gender}'no existe!`;
+            throw HttpError(HttpStatus.NOT_FOUND, message);
+        }
+
         if (await existsByDni(customer.dni)) {
             const message = `El DNI '${customer.dni}' ya existe!`;
             throw HttpError(HttpStatus.CONFLICT, message);
@@ -19,10 +27,10 @@ module.exports = {
             throw HttpError(HttpStatus.CONFLICT, message);
         }
 
-        const regionId = await regionRepo.findOne({ name: customer.regionName });
+        const countryId = await countryRepo.findOne({ name: customer.countryName });
 
-        if (!regionId) {
-            const message = `La region '${customer.regionName}' no existe!`;
+        if (!countryId) {
+            const message = `El país '${customer.countryName}' no existe!`;
             throw HttpError(HttpStatus.NOT_FOUND, message);
         }
 
@@ -32,20 +40,13 @@ module.exports = {
             dni: customer.dni,
             name: customer.name,
             email: customer.email,
+            gender: customer.gender,
+            dateOfBirth: customer.dateOfBirth,
             photoUrl: customer.photoUrl,
             state: "CREATED",
             user: userId._id,
-            region: regionId._id,
+            country: countryId._id,
         });
-    },
-
-    saveRegion: async (regionName) => {
-        try {
-            const regionDB = await regionRepo.create({ name: regionName });
-            return regionDB;
-        } catch (e) {
-            throw HttpError(HttpStatus.CONFLICT, e.message);
-        }
     },
     deleteById: async (id) => {
         try {
@@ -56,14 +57,21 @@ module.exports = {
         }
     },
 
+    existsEmail: async (email) => {
+        const exists = Boolean(await existsByEmail(email));
+        return { exists };
+    },
+
     findAll: async () => await customerRepo.find({}),
+    
+    findAllCountries: async () => await countryRepo.find({}),
 
     findById: async (id) => {
         let customerDB = null;
         try {
             customerDB = await customerRepo
                 .findById(id)
-                .populate(["user", "region"]);
+                .populate(["user", "country"]);
         } catch (e) {
             const message = `El customer no existe!`;
             throw HttpError(HttpStatus.NOT_FOUND, message);

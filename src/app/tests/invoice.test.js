@@ -13,6 +13,8 @@ beforeEach(async () => {
 
 describe("GET /invoices", () => {
     test("NO CONTENT, cuando no hay compras", async () => {
+        await invoiceRepo.deleteMany();
+
         const response = await API.get(`/invoices`).send();
 
         expect(response.status).toBe(HttpStatus.NO_CONTENT);

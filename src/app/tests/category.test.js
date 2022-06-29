@@ -12,6 +12,8 @@ beforeEach(async () => {
 
 describe("GET /categories", () => {
     test("NO CONTENT, cuando no hay categorias", async () => {
+        await categoryRepo.deleteMany();
+        
         const response = await API.get("/categories").send();
 
         expect(response.status).toBe(HttpStatus.NO_CONTENT);

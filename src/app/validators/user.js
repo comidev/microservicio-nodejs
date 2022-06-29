@@ -6,5 +6,8 @@ const saveAdminOrLogin = [
     validateResults,
 ];
 
-
-module.exports = { saveAdminOrLogin };
+const existsUsername = [
+    check(["username"]).exists().notEmpty().isLength({ min: 3 }),
+    validateResults,
+];
+module.exports = { saveAdminOrLogin, existsUsername };

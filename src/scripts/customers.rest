@@ -14,21 +14,22 @@ Content-Type: application/json
     "dni" : "70889652",
     "name" : "Cesar Miranda",
     "email" : "cesar@gmail.com",
+    "dateOfBirth" : "10/20/2021",
+    "gender" : "Masculino",
     "photoUrl" : "none",
     "user" : {
         "username" : "cesar",
         "password" : "123"
     },
-    "regionName" : "Gorgor"
+    "countryName" : "Chile"
 }
 
-### ? Guarda una REGION  | TOKEN  | ROL: ADMIN
-POST http://localhost:3000/customers/regions
+### ? Existe email ?
+POST http://localhost:3000/customers/validate/email
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyYjY0MGEyOTA1NGY3N2ZlODNlNzg4YyIsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlcyI6WyJBRE1JTiJdLCJpYXQiOjE2NTYxNzAwOTcsImV4cCI6MTY1NjE3MTg5NywiaXNzIjoiY29taWRldiIsInN1YiI6ImFkbWluIn0.G3ELWlKZOKUbamcfJXUM9e50iiyCe9EImiwN1w7fAQ4
 
 {
-   "name" : "Gorgor"
+    "email" : "existo@xd.com"
 }
 
 ### ? Elimina un CLIENTE por ID | TOKEN  | ROL: ADMIN, CLIENTE

@@ -10,8 +10,10 @@ beforeEach(async () => {
     await productRepo.deleteMany();
 });
 
-describe("GET /products", () => {
+describe("GET /products?categoryName=...&name=...", () => {
     test("NO CONTENT, cuando no hay productos", async () => {
+        await productRepo.deleteMany();
+
         const response = await API.get(`/products`).send();
 
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
@@ -24,15 +26,14 @@ describe("GET /products", () => {
 
         expect(response.status).toBe(HttpStatus.OK);
     });
-});
 
-describe("GET /products?categoryName", () => {
     test("NOT FOUND, el nombre de categoria no existe", async () => {
         const response = await API.get(`/products?categoryName=No existo uu`).send();
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
+    // TODO: ?categoryName
     test("NO CONTENT, cuando la categoria no tiene productos", async () => {
         const { name: catengoryName } = await createCategory();
 
@@ -50,6 +51,35 @@ describe("GET /products?categoryName", () => {
         const response = await API.get(
             `/products?categoryName=${categoryName}`
         ).send();
+
+        expect(response.status).toBe(HttpStatus.OK);
+    });
+    // TODO: ?name
+    test("NO CONTENT, cuando el producto no existe", async () => {
+        const response = await API.get(`/products?name=${"noexistooo"}`).send();
+
+        expect(response.status).toBe(HttpStatus.NO_CONTENT);
+    });
+
+    test("OK, cuando el nombre matchea con al menos un producto", async () => {
+        const { name } = await createProduct();
+
+        const response = await API.get(`/products?name=${name}`).send();
+        console.log(response.body);
+        expect(response.status).toBe(HttpStatus.OK);
+    });
+
+    // TODO: ?categoryName=...&name=...
+    test("OK, cuando al menos hay un producto que tiene esa categoría", async () => {
+        const { _id: categoryId, name: categoryName } = await createCategory();
+        const { name: productName } = await createProduct({
+            categoriesId: [categoryId],
+        });
+
+        const response = await API.get(
+            `/products?categoryName=${categoryName}&name=${productName}`
+        ).send();
+        console.log(response.body);
 
         expect(response.status).toBe(HttpStatus.OK);
     });
@@ -106,6 +136,7 @@ describe("POST /products", () => {
         const productRequest = {
             name: "Producto n-esimo",
             description: "Producto productero",
+            photoUrl: "xd",
             stock: 100,
             price: 150.5,
             categories: ["no existo :(", "yo tampoco u-u"],
@@ -122,6 +153,7 @@ describe("POST /products", () => {
         const productRequest = {
             name: "Producto n-esimo",
             description: "Producto productero",
+            photoUrl: "xd",
             stock: 100,
             price: 150.5,
             categories: [categoryName1, categoryName2],

@@ -20,7 +20,7 @@ module.exports = {
 
         for (const item of items) {
             const { productId, quantity } = item;
-            await productService.updateStock(productId, quantity);
+            await productService.updateStock(productId, -1 * quantity);
         }
 
         const invoiceItemsDB = [];
