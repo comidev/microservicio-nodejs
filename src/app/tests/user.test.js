@@ -2,7 +2,7 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
-const { createUser, createRole } = require("./helpers/index");
+const { createUser, createRole, createCustomer } = require("./helpers/index");
 
 const userRepo = require("../services/model/mongodb/user");
 const jwtService = require("../utils/jwt");
@@ -173,6 +173,22 @@ describe("POST /users/login", () => {
             jwtService.isBearer(`Bearer ${refresh_token}`);
         expect(isBearer).toBe(true);
     });
+
+    test("OK, cuando ingresamos con email y password, y recibimos un token", async () => {
+        const { _id } = await createRole();
+        const { _id: userId, password } = await createUser({ role: _id });
+        const { email } = await createCustomer({ userId });
+        const userRequest = { username: email, password };
+
+        const response = await API.post(`/users/login`).send(userRequest);
+
+        expect(response.status).toBe(HttpStatus.OK);
+        const { access_token, refresh_token } = response.body;
+        const isBearer =
+            jwtService.isBearer(`Bearer ${access_token}`) &&
+            jwtService.isBearer(`Bearer ${refresh_token}`);
+        expect(isBearer).toBe(true);
+    });
 });
 
 describe("POST /users/token/refresh", () => {
@@ -250,6 +266,80 @@ describe("POST /users/validate/username", () => {
         expect(response.status).toBe(HttpStatus.OK);
         expect(response.body.exists).toBeDefined();
         expect(response.body.exists).toBeFalsy();
+    });
+});
+
+describe("POST /users/auth/info", () => {
+    test("UNAUTHORIZED, cuando no hay token en el header", async () => {
+        const response = await API.post(`/users/auth/info`).send();
+
+        expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+    });
+
+    test("UNAUTHORIZED, cuando el token es incorrecto", async () => {
+        const response = await API.post(`/users/auth/info`).set({
+            Authorization: "Beaer token.feik",
+        });
+
+        expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+    });
+
+    test("OK, cuando el token es correcto", async () => {
+        const { _id } = await createRole();
+        const { _id: userId, username, password } = await createUser({ role: _id });
+        const { photoUrl, _id: customerId, name } = await createCustomer({ userId });
+
+        const userRequest = { username, password };
+        const responseLogin = await API.post(`/users/login`).send(userRequest);
+        const { access_token } = responseLogin.body;
+
+        const response = await API.post(`/users/auth/info`).set({
+            Authorization: `Bearer ${access_token}`,
+        });
+
+        expect(response.status).toBe(HttpStatus.OK);
+        expect(response.body.photoUrl).toBe(photoUrl);
+        expect(response.body.customerId).toBe(customerId.toJSON());
+        expect(response.body.username).toBe(username);
+        expect(response.body.name).toBe(name);
+    });
+});
+
+describe("PUT /users/:id/password", () => {
+    test("BAD REQUEST, cuando el body esta vacio", async () => {
+        const response = await API.put(`/users/123/password`).send();
+
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+    test("NOT FOUND, cuando el id es incorrecto", async () => {
+        const response = await API.put(`/users/123/password`).send({
+            currentPassword: "xd1",
+            newPassword: "xd2",
+        });
+
+        expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+
+    test("UNAUTHORIZED, cuando el password es incorrecto", async () => {
+        const { _id: userId } = await createUser();
+
+        const response = await API.put(`/users/${userId}/password`).send({
+            currentPassword: "soy_un_mal_password",
+            newPassword: "xd2",
+        });
+
+        expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+    });
+
+    test("OK, cuando el password es correcto y se actualiza", async () => {
+        const { _id: userId, password } = await createUser();
+
+        const response = await API.put(`/users/${userId}/password`).send({
+            currentPassword: password,
+            newPassword: "SoyNuevo",
+        });
+
+        expect(response.status).toBe(HttpStatus.OK);
     });
 });
 

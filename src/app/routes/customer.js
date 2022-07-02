@@ -8,6 +8,14 @@ const router = express.Router();
 
 router.post("", validator.saveCustomer, controller.save);
 
+router.put(
+    "/:id",
+    validator.saveCustomer,
+    handleToken,
+    handleRoles(ROLES.CLIENTE),
+    controller.update
+);
+
 router.post("/validate/email", validator.existsEmail, controller.existsEmail);
 
 router.get("/countries", controller.findAllCountries);

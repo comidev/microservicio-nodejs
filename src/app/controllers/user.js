@@ -60,4 +60,25 @@ module.exports = {
             next(error);
         }
     },
+    authInfo: async (req, res, next) => {
+        try {
+            const authorization = req.get("authorization");
+            const authInfo = await userService.authInfo(authorization);
+            res.status(200);
+            res.send(authInfo);
+        } catch (error) {
+            next(error);
+        }
+    },
+    updatePassword: async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const { currentPassword, newPassword } = req.body;
+            await userService.updatePassword(currentPassword, newPassword, id);
+            res.status(200);
+            res.send();
+        } catch (error) {
+            next(error);
+        }
+    },
 };

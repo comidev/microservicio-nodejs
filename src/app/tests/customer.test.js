@@ -6,6 +6,7 @@ const GENDERS = require("../utils/genders");
 const { createCustomer, createUser, createCountry } = require("./helpers/index");
 const countryRepo = require("../services/model/mongodb/country");
 const customerRepo = require("../services/model/mongodb/customer");
+const userRepo = require("../services/model/mongodb/user");
 
 const API = supertest(app);
 
@@ -94,7 +95,7 @@ describe("POST /customers", () => {
             countryName,
         };
 
-        const response = await API.post(`/customers/`).send(customerRequest);
+        const response = await API.post(`/customers`).send(customerRequest);
 
         expect(response.status).toBe(HttpStatus.CONFLICT);
     });
@@ -120,6 +121,7 @@ describe("POST /customers", () => {
     });
 
     test("CREATED, cuando los campos son correctos", async () => {
+        await userRepo.deleteMany();
         const { name: countryName } = await createCountry();
 
         const customerRequest = {
@@ -130,14 +132,14 @@ describe("POST /customers", () => {
             email: "email@email.com",
             photoUrl: "none",
             user: {
-                username: "username",
+                username: "usernameIrrepetibleYUnico",
                 password: "123",
             },
             countryName,
         };
 
         const response = await API.post(`/customers/`).send(customerRequest);
-        
+
         expect(response.status).toBe(HttpStatus.CREATED);
     });
 });
@@ -206,6 +208,100 @@ describe("POST /customers/validate/email", () => {
         expect(response.status).toBe(HttpStatus.OK);
         expect(response.body.exists).toBeDefined();
         expect(response.body.exists).toBeFalsy();
+    });
+});
+
+describe("PUT /customers/:id", () => {
+    test("BAD REQUEST, cuando el body esta vacio", async () => {
+        const response = await API.put(`/customers/:id`).send({});
+
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
+    test("NOT FOUND, cuando el id no existe", async () => {
+        const { email, name, photoUrl, dni, gender, dateOfBirth } =
+            await createCustomer();
+
+        const customerReq = {
+            dni,
+            name,
+            email,
+            photoUrl,
+            gender,
+            dateOfBirth,
+            countryName: "Perú",
+            user: {
+                username: "feik",
+                password: "soy_falso",
+            },
+        };
+
+        const response = await API.put(`/customers/123`).send(customerReq);
+
+        expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    });
+
+    test("UNAUTHORIZED, cuando el password es incorrecto", async () => {
+        const { _id: countryId, name: countryName } = await createCountry();
+        const { _id: userId, username, password } = await createUser();
+        const {
+            _id: customerId,
+            email,
+            name,
+            photoUrl,
+            dni,
+            gender,
+            dateOfBirth,
+        } = await createCustomer({ userId, countryId });
+
+        const customerReq = {
+            dni,
+            name,
+            email,
+            photoUrl,
+            gender,
+            dateOfBirth,
+            countryName,
+            user: {
+                username,
+                password: "soy_falso",
+            },
+        };
+
+        const response = await API.put(`/customers/${customerId}`).send(customerReq);
+
+        expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
+    });
+    test("OK, cuando todo está correcto y se actualiza", async () => {
+        const { _id: countryId, name: countryName } = await createCountry();
+        const { _id: userId, username, password } = await createUser();
+        const {
+            _id: customerId,
+            email,
+            photoUrl,
+            dni,
+            gender,
+            dateOfBirth,
+        } = await createCustomer({ userId, countryId });
+
+        const customerReq = {
+            dni,
+            name: "Cesar Espinoza",
+            email,
+            photoUrl,
+            gender,
+            dateOfBirth,
+            countryName,
+            user: {
+                username,
+                password,
+            },
+        };
+
+        const response = await API.put(`/customers/${customerId}`).send(customerReq);
+        console.log(response.body);
+
+        expect(response.status).toBe(HttpStatus.OK);
     });
 });
 

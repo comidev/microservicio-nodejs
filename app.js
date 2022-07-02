@@ -9,8 +9,10 @@ const routes = require("./src/routes/index");
 const { handleGeneralError } = require("./src/app/middleware/handleError");
 const { error404 } = require("./src/app/middleware/404");
 
+const { initDataBase } = require("./src/app/utils/database");
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const { ENGINE_DB } = process.env;
 
 app.use(cors());
@@ -23,10 +25,17 @@ app.use(handleGeneralError);
 
 ENGINE_DB === "mongodb" ? dbConnectMongoDB() : dbConnectMySQL();
 
-
-
 const server = app.listen(PORT, () => {
     console.log("Port start :v ", PORT);
+    setTimeout(() => {
+        initDataBase()
+            .then(() => {
+                console.log("Base de datos iniciada :D!");
+            })
+            .catch((error) => {
+                console.log({ msg: "Error :(", error });
+            });
+    }, 5000);
 });
 
 module.exports = { app, server };

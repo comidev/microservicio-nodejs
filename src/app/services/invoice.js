@@ -61,9 +61,20 @@ module.exports = {
     findByCustomerId: async (id) => {
         let invoicesDB = null;
         try {
-            invoicesDB = await invoiceRepo
+            const invoicesDB_ = await invoiceRepo
                 .find({ customer: id })
-                .populate(["customer", "invoiceItems"]);
+                .populate({ path: "invoiceItems", populate: { path: "product" } });
+            invoicesDB = invoicesDB_.map((item) => {
+                const { description, invoiceItems: invoiceItems_ } = item;
+                let total = 0;
+                const invoiceItems = invoiceItems_.map((item2) => {
+                    const { quantity, product } = item2;
+                    const { name, _id: productId, photoUrl, price } = product;
+                    total += price * quantity;
+                    return { quantity, name, productId, photoUrl, price };
+                });
+                return { description, invoiceItems, total };
+            });
         } catch (e) {
             throw HttpError(HttpStatus.NOT_FOUND, e.message);
         }

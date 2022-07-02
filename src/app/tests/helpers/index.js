@@ -34,7 +34,7 @@ const createUser = async ({ role = generateId() } = { role: generateId() }) => {
 };
 
 // TODO: COUNTRY
-const createCountry = async ({ countryName = "País" } = { countryName: "País" }) => {
+const createCountry = async ({ countryName = "Perú" } = { countryName: "Perú" }) => {
     const country = { name: countryName };
     const { _id, name } =
         (await countryRepo.findOne(country)) || (await countryRepo.create(country));
@@ -53,14 +53,13 @@ const createCustomer = async (
         name: "Omar",
         email: shortUUID().generate(),
         photoUrl: "none",
-        gender: "Masculino",
+        gender: "MASCULINO",
         dateOfBirth: new Date(2000, 3, 11),
         state: "CREATED",
         user: userId,
         country: countryId,
     };
-    const { _id, name, dni, email } = await customerRepo.create(customer);
-    return { _id, name, dni, email };
+    return await customerRepo.create(customer);
 };
 
 // TODO: CATEGORY

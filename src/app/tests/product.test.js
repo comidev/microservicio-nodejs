@@ -65,7 +65,7 @@ describe("GET /products?categoryName=...&name=...", () => {
         const { name } = await createProduct();
 
         const response = await API.get(`/products?name=${name}`).send();
-        console.log(response.body);
+
         expect(response.status).toBe(HttpStatus.OK);
     });
 
@@ -79,7 +79,6 @@ describe("GET /products?categoryName=...&name=...", () => {
         const response = await API.get(
             `/products?categoryName=${categoryName}&name=${productName}`
         ).send();
-        console.log(response.body);
 
         expect(response.status).toBe(HttpStatus.OK);
     });

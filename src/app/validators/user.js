@@ -10,4 +10,13 @@ const existsUsername = [
     check(["username"]).exists().notEmpty().isLength({ min: 3 }),
     validateResults,
 ];
-module.exports = { saveAdminOrLogin, existsUsername };
+
+const updatePassword = [
+    check(["currentPassword", "newPassword"])
+        .exists()
+        .notEmpty()
+        .isLength({ min: 3 }),
+    validateResults,
+];
+
+module.exports = { saveAdminOrLogin, existsUsername, updatePassword };

@@ -4,9 +4,9 @@ GET http://localhost:3000/products
 
 ### ? Devuelve todas los productos por nombre de
 #   ? categoria y/o nombre de producto
-GET http://localhost:3000/products
-    ?categoryName=Adulto
-    &name=Inca
+GET http://localhost:8080/products
+    ?categoryName=
+    &name=Palta 
 
 
 ### ? Devuelve un producto según el /id

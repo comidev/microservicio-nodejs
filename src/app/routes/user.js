@@ -12,6 +12,21 @@ router.post("/login", validator.saveAdminOrLogin, controller.login);
 // TODO: TODOS
 router.post("/token/refresh", controller.tokenRefresh);
 // TODO: TODOS
+router.put(
+    "/:id/password",
+    validator.updatePassword,
+    handleToken,
+    handleRoles(ROLES.CLIENTE),
+    controller.updatePassword
+);
+// TODO: CLIENTE
+router.post(
+    "/auth/info",
+    handleToken,
+    handleRoles(ROLES.CLIENTE),
+    controller.authInfo
+);
+// TODO: TODOS
 router.post(
     "/validate/username",
     validator.existsUsername,

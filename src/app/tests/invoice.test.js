@@ -2,7 +2,12 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
-const { createInvoice, createCustomer, createProduct } = require("./helpers/index");
+const {
+    createInvoice,
+    createCustomer,
+    createProduct,
+    createInvoiceItem,
+} = require("./helpers/index");
 const invoiceRepo = require("../services/model/mongodb/invoice");
 const invoiceItemRepo = require("../services/model/mongodb/invoiceItem");
 const API = supertest(app);
@@ -61,8 +66,11 @@ describe("GET /invoices/customer/:id", () => {
     });
 
     test("OK, cuando el id es correcto y tiene al menos una compra", async () => {
+        const { _id: productId } = await createProduct();
+        const { _id: invoiceItemId } = await createInvoiceItem({ productId });
         const { _id: customerId } = await createCustomer();
-        await createInvoice({ customerId });
+
+        await createInvoice({ customerId, invoiceItemsIds: [invoiceItemId] });
 
         const response = await API.get(`/invoices/customer/${customerId}`).send();
 

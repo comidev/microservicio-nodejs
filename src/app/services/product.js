@@ -1,6 +1,7 @@
 const { HttpError, HttpStatus } = require("../middleware/handleError");
 const categoryService = require("../services/category");
 const productRepo = require("./model/mongodb/product");
+const PRODUCTS = require("../utils/products");
 
 const findById = async (id) => {
     let productDB = null;
@@ -14,6 +15,28 @@ const findById = async (id) => {
         throw HttpError(HttpStatus.NOT_FOUND, message);
     }
     return productDB;
+};
+
+const initProducts = async () => {
+    const exists = await productRepo.findOne({
+        name: "Smartphone Samsung Galaxy A03 Core 32GB 2G Black",
+    });
+    if (!Boolean(exists)) {
+        // ! OPCIÓN 1:
+        // for (const country of COUNTRIES) {
+        //     await countryRepo.create(country);
+        // }
+
+        // ! OPCIÓN 2:
+        const PRODUCTS_ARRAY = await PRODUCTS(async (categoryName) => {
+            const { _id } = await categoryService.findByName(categoryName);
+            return _id;
+        });
+        const createPromisesArray = PRODUCTS_ARRAY.map((item) =>
+            productRepo.create(item)
+        );
+        await Promise.all(createPromisesArray);
+    }
 };
 
 module.exports = {
@@ -49,7 +72,7 @@ module.exports = {
             filter.categories = category;
         }
         if (name) {
-            filter.name = [name];
+            filter.name = { $regex: name, $options: "i" };
         }
         return await productRepo.find(filter);
     },
@@ -59,4 +82,5 @@ module.exports = {
         await productRepo.findByIdAndUpdate(id, { stock: newQuantity });
     },
     findById,
+    initProducts,
 };

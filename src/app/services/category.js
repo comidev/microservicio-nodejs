@@ -1,5 +1,6 @@
 const { HttpError, HttpStatus } = require("../middleware/handleError");
 const categoryRepo = require("./model/mongodb/category");
+const CATEGORIES = require("../utils/categories");
 
 const findByName = async (name) => {
     const categoryDB = await categoryRepo.findOne({ name });
@@ -13,6 +14,22 @@ const findByName = async (name) => {
 const existsByName = async (name) => {
     const exists = Boolean(await categoryRepo.findOne({ name }));
     return exists;
+};
+
+const initCategories = async () => {
+    const exists = await categoryRepo.findOne({ name: "Tecnologia" });
+    if (!Boolean(exists)) {
+        // ! OPCIÓN 1:
+        // for (const country of COUNTRIES) {
+        //     await countryRepo.create(country);
+        // }
+
+        // ! OPCIÓN 2:
+        const createPromisesArray = CATEGORIES.map((item) =>
+            categoryRepo.create(item)
+        );
+        await Promise.all(createPromisesArray);
+    }
 };
 
 module.exports = {
@@ -41,4 +58,5 @@ module.exports = {
         return categoryDB;
     },
     findByName,
+    initCategories,
 };

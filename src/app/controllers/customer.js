@@ -11,6 +11,16 @@ module.exports = {
             next(error);
         }
     },
+    save: async (req, res, next) => {
+        try {
+            const customer = req.body;
+            const customerDB = await customerService.save(customer);
+            res.status(201);
+            res.send(customerDB);
+        } catch (error) {
+            next(error);
+        }
+    },
     deleteById: async (req, res, next) => {
         try {
             const { id } = req.params;
@@ -21,6 +31,7 @@ module.exports = {
             next(error);
         }
     },
+
     existsEmail: async (req, res, next) => {
         try {
             const { email } = req.body;
@@ -55,6 +66,17 @@ module.exports = {
             const customerDB = await customerService.findById(id);
             res.status(200);
             res.send(customerDB);
+        } catch (error) {
+            next(error);
+        }
+    },
+    update: async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const customer = req.body;
+            await customerService.update(customer, id);
+            res.status(200);
+            res.send();
         } catch (error) {
             next(error);
         }
