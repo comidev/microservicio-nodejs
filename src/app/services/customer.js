@@ -190,9 +190,9 @@ module.exports = {
         } = customerDB;
 
         const { name: country } = countryDB;
-        const { username } = userDB;
+        const { _id: userId, username } = userDB;
 
-        const user = { username };
+        const user = { userId, username };
 
         return {
             customerId,

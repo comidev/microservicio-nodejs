@@ -14,7 +14,7 @@ const createToken = (payload, extraTimeInSeconds = 0) => {
 
 const createTokens = (payload) => {
     const accessToken = createToken(payload);
-    const refreshToken = createToken(payload, 600); //* 5 min extra
+    const refreshToken = createToken(payload,1800); //* 5 min extra
     return { access_token: accessToken, refresh_token: refreshToken };
 };
 

@@ -2,7 +2,13 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
-const { createUser, createRole, createCustomer } = require("./helpers/index");
+const {
+    createUser,
+    createRole,
+    createCustomer,
+    createTokenAdmin,
+    createTokenClient,
+} = require("./helpers/index");
 
 const userRepo = require("../services/model/mongodb/user");
 const jwtService = require("../utils/jwt");
@@ -14,17 +20,23 @@ beforeEach(async () => {
 
 describe("GET /users", () => {
     test("NO CONTENT, cuando no hay usuarios", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
         await userRepo.deleteMany();
 
-        const response = await API.get(`/users`).send();
+        const response = await API.get(`/users`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
 
     test("OK, cuando hay al menos un usuario", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
         await createUser();
 
-        const response = await API.get(`/users`).send();
+        const response = await API.get(`/users`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.OK);
     });
@@ -32,15 +44,21 @@ describe("GET /users", () => {
 
 describe("GET /users/:id", () => {
     test("NOT FOUND, cuando el id es incorrecto", async () => {
-        const response = await API.get(`/users/123`).send();
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
+        const response = await API.get(`/users/123`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     test("OK, cuando el id es correcto", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
         const { _id } = await createUser();
 
-        const response = await API.get(`/users/${_id}`).send();
+        const response = await API.get(`/users/${_id}`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.OK);
     });
@@ -61,17 +79,6 @@ describe("POST /users/admin", () => {
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
-    test("BAD REQUEST, cuando los campos presentan ' ' espacios", async () => {
-        const userRequest = {
-            username: "soy el  user   name",
-            password: "strong password",
-        };
-
-        const response = await API.post(`/users/admin`).send(userRequest);
-
-        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    });
-
     test("BAD REQUEST, cuando el username y/o password es menor 3 length", async () => {
         const userRequest = { username: "so", password: "12" };
 
@@ -80,25 +87,45 @@ describe("POST /users/admin", () => {
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
 
+    test("BAD REQUEST, cuando los campos presentan ' ' espacios", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
+        const userRequest = {
+            username: "soy el  user   name",
+            password: "strong password",
+        };
+
+        const response = await API.post(`/users/admin`).set(token).send(userRequest);
+
+        expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    });
+
     test("CONFLICT, cuando el username ya existe", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
         const { username } = await createUser();
         const userRequest = {
             username: username,
             password: "1234",
         };
 
-        const response = await API.post(`/users/admin`).send(userRequest);
+        const response = await API.post(`/users/admin`).set(token).send(userRequest);
 
         expect(response.status).toBe(HttpStatus.CONFLICT);
     });
 
     test("CREATED, cuando los campos no son vacios y el username es nuevo", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
         const userRequest = {
             username: "soy_un_username_nuevo",
             password: "1234",
         };
 
-        const response = await API.post(`/users/admin`).send(userRequest);
+        const response = await API.post(`/users/admin`).set(token).send(userRequest);
 
         expect(response.status).toBe(HttpStatus.CREATED);
     });
@@ -312,7 +339,10 @@ describe("PUT /users/:id/password", () => {
         expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     });
     test("NOT FOUND, cuando el id es incorrecto", async () => {
-        const response = await API.put(`/users/123/password`).send({
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenClient();
+
+        const response = await API.put(`/users/123/password`).set(token).send({
             currentPassword: "xd1",
             newPassword: "xd2",
         });
@@ -321,9 +351,12 @@ describe("PUT /users/:id/password", () => {
     });
 
     test("UNAUTHORIZED, cuando el password es incorrecto", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenClient();
+
         const { _id: userId } = await createUser();
 
-        const response = await API.put(`/users/${userId}/password`).send({
+        const response = await API.put(`/users/${userId}/password`).set(token).send({
             currentPassword: "soy_un_mal_password",
             newPassword: "xd2",
         });
@@ -332,9 +365,12 @@ describe("PUT /users/:id/password", () => {
     });
 
     test("OK, cuando el password es correcto y se actualiza", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenClient();
+
         const { _id: userId, password } = await createUser();
 
-        const response = await API.put(`/users/${userId}/password`).send({
+        const response = await API.put(`/users/${userId}/password`).set(token).send({
             currentPassword: password,
             newPassword: "SoyNuevo",
         });

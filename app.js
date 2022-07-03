@@ -30,10 +30,8 @@ const server = app.listen(PORT, () => {
     setTimeout(() => {
         initDataBase()
             .then(() => {
-                console.log("Base de datos iniciada :D!");
             })
             .catch((error) => {
-                console.log({ msg: "Error :(", error });
             });
     }, 5000);
 });

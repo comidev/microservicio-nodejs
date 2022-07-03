@@ -60,6 +60,16 @@ module.exports = {
             next(error);
         }
     },
+    tokenValidate: (req, res, next) => {
+        try {
+            const authorization = req.get("authorization");
+            const isValid = userService.tokenValidate(authorization);
+            res.status(200);
+            res.send({ isValid });
+        } catch (error) {
+            next(error);
+        }
+    },
     authInfo: async (req, res, next) => {
         try {
             const authorization = req.get("authorization");

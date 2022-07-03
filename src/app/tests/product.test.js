@@ -2,7 +2,11 @@ const supertest = require("supertest");
 const mongoose = require("mongoose");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
-const { createProduct, createCategory } = require("./helpers/index");
+const {
+    createProduct,
+    createCategory,
+    createTokenAdmin,
+} = require("./helpers/index");
 const productRepo = require("../services/model/mongodb/product");
 const API = supertest(app);
 
@@ -132,6 +136,9 @@ describe("POST /products", () => {
     });
 
     test("NOT FOUND, cuando al menos una categoria no existe ", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
         const productRequest = {
             name: "Producto n-esimo",
             description: "Producto productero",
@@ -141,12 +148,15 @@ describe("POST /products", () => {
             categories: ["no existo :(", "yo tampoco u-u"],
         };
 
-        const response = await API.post(`/products`).send(productRequest);
+        const response = await API.post(`/products`).set(token).send(productRequest);
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     test("CREATED, cuando los campos no son vacios y las categorias existen", async () => {
+        //TODO: Token y Rol de acceso :D
+        const token = await createTokenAdmin();
+
         const { name: categoryName1 } = await createCategory();
         const { name: categoryName2 } = await createCategory();
         const productRequest = {
@@ -158,7 +168,7 @@ describe("POST /products", () => {
             categories: [categoryName1, categoryName2],
         };
 
-        const response = await API.post(`/products`).send(productRequest);
+        const response = await API.post(`/products`).set(token).send(productRequest);
 
         expect(response.status).toBe(HttpStatus.CREATED);
     });

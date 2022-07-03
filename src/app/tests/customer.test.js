@@ -3,7 +3,13 @@ const mongoose = require("mongoose");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
 const GENDERS = require("../utils/genders");
-const { createCustomer, createUser, createCountry } = require("./helpers/index");
+const {
+    createCustomer,
+    createUser,
+    createCountry,
+    createTokenAdmin,
+    createTokenClient,
+} = require("./helpers/index");
 const countryRepo = require("../services/model/mongodb/country");
 const customerRepo = require("../services/model/mongodb/customer");
 const userRepo = require("../services/model/mongodb/user");
@@ -16,17 +22,22 @@ beforeEach(async () => {
 
 describe("GET /customers", () => {
     test("NO CONTENT, cuando no hay clientes", async () => {
+        //TODO: Token y Rol de acceso
+        const token = await createTokenAdmin();
+
         await customerRepo.deleteMany();
 
-        const response = await API.get(`/customers`).send();
+        const response = await API.get(`/customers`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
     });
 
     test("OK, cuando hay al menos un cliente", async () => {
         await createCustomer();
+        //TODO: Token y Rol de acceso
+        const token = await createTokenAdmin();
 
-        const response = await API.get(`/customers`).send();
+        const response = await API.get(`/customers`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.OK);
     });
@@ -34,15 +45,23 @@ describe("GET /customers", () => {
 
 describe("GET /customers/:id", () => {
     test("NOT FOUND, cuando el id es incorrecto o no existe", async () => {
-        const response = await API.get(`/customers/123`).send();
+        //TODO: Token y Rol de acceso
+        const token = await createTokenClient();
+
+        const response = await API.get(`/customers/123`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     test("OK, cuando el id es correcto y existe", async () => {
-        const { _id, name } = await createCustomer();
+        //TODO: Token y Rol de acceso
+        const token = await createTokenClient();
 
-        const response = await API.get(`/customers/${_id}`).send();
+        const { _id: countryId } = await createCountry();
+        const { _id: userId } = await createUser();
+        const { _id, name } = await createCustomer({ userId, countryId });
+
+        const response = await API.get(`/customers/${_id}`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.OK);
         expect(response.body.name).toBe(name);
@@ -164,15 +183,20 @@ describe("GET /customers/countries", () => {
 
 describe("DELETE /customers/:id", () => {
     test("NOT FOUND, cuando el id no existe", async () => {
-        const response = await API.delete("/customers/123").send();
+        //TODO: Token y Rol de acceso
+        const token = await createTokenAdmin();
+
+        const response = await API.delete("/customers/123").set(token).send();
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
 
     test("OK, cuando hay se elimina con exito", async () => {
         const { _id } = await createCustomer();
+        //TODO: Token y Rol de acceso
+        const token = await createTokenAdmin();
 
-        const response = await API.delete(`/customers/${_id}`).send();
+        const response = await API.delete(`/customers/${_id}`).set(token).send();
 
         expect(response.status).toBe(HttpStatus.OK);
     });
@@ -236,7 +260,12 @@ describe("PUT /customers/:id", () => {
             },
         };
 
-        const response = await API.put(`/customers/123`).send(customerReq);
+        //TODO: Token y Rol de acceso
+        const token = await createTokenClient();
+
+        const response = await API.put(`/customers/123`)
+            .set(token)
+            .send(customerReq);
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
     });
@@ -268,7 +297,12 @@ describe("PUT /customers/:id", () => {
             },
         };
 
-        const response = await API.put(`/customers/${customerId}`).send(customerReq);
+        //TODO: Token y Rol de acceso
+        const token = await createTokenClient();
+
+        const response = await API.put(`/customers/${customerId}`)
+            .set(token)
+            .send(customerReq);
 
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
@@ -298,8 +332,12 @@ describe("PUT /customers/:id", () => {
             },
         };
 
-        const response = await API.put(`/customers/${customerId}`).send(customerReq);
-        console.log(response.body);
+        //TODO: Token y Rol de acceso
+        const token = await createTokenClient();
+
+        const response = await API.put(`/customers/${customerId}`)
+            .set(token)
+            .send(customerReq);
 
         expect(response.status).toBe(HttpStatus.OK);
     });

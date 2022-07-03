@@ -2,6 +2,7 @@ const shortUUID = require("short-uuid");
 const mongoose = require("mongoose");
 
 const passwordService = require("../../utils/password");
+const jwtService = require("../../utils/jwt");
 const userRepo = require("../../services/model/mongodb/user");
 const roleRepo = require("../../services/model/mongodb/role");
 const customerRepo = require("../../services/model/mongodb/customer");
@@ -32,6 +33,24 @@ const createUser = async ({ role = generateId() } = { role: generateId() }) => {
     const { _id, username } = await userRepo.create(user);
     return { _id, username, password };
 };
+
+const createUserByRole = async (role) => {
+    const { _id: roleId } = await createRole(role);
+    const user = await createUser({ role: roleId });
+    user.roles = [role];
+    return user;
+};
+
+//TODO: Token y Rol de acceso
+const createToken = async (role) => {
+    const { _id: id, username, roles } = await createUserByRole(role);
+    const { access_token } = jwtService.createTokens({ id, username, roles });
+    const token = { Authorization: `Bearer ${access_token}` };
+    return token;
+};
+
+const createTokenAdmin = async () => await createToken("ADMIN");
+const createTokenClient = async () => await createToken("CLIENTE");
 
 // TODO: COUNTRY
 const createCountry = async ({ countryName = "Perú" } = { countryName: "Perú" }) => {
@@ -125,6 +144,8 @@ module.exports = {
     createProduct,
     createRole,
     createUser,
+    createTokenAdmin,
+    createTokenClient,
     createCountry,
     createCategory,
     createInvoiceItem,

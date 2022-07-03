@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const { app, server } = require("../../../app");
 const { HttpStatus } = require("../middleware/handleError");
 const categoryRepo = require("../services/model/mongodb/category");
-const { createCategory } = require("./helpers/index");
+const {
+    createCategory,
+    createTokenAdmin,
+} = require("./helpers/index");
 const API = supertest(app);
 
 beforeEach(async () => {
@@ -13,7 +16,7 @@ beforeEach(async () => {
 describe("GET /categories", () => {
     test("NO CONTENT, cuando no hay categorias", async () => {
         await categoryRepo.deleteMany();
-        
+
         const response = await API.get("/categories").send();
 
         expect(response.status).toBe(HttpStatus.NO_CONTENT);
@@ -47,9 +50,12 @@ describe("GET /categories/:id", () => {
 
 describe("POST /categories", () => {
     test("CONFLICT, cuando el 'name' ya existe", async () => {
+        //TODO: Token y Rol de acceso
+        const token = await createTokenAdmin();
+
         const { name } = await createCategory({ categoryName: "Ya existo :D" });
 
-        const response = await API.post("/categories").send({ name });
+        const response = await API.post("/categories").set(token).send({ name });
 
         expect(response.status).toBe(HttpStatus.CONFLICT);
     });
@@ -61,7 +67,10 @@ describe("POST /categories", () => {
     });
 
     test("CREATED, cuando 'name' es nuevo", async () => {
-        const response = await API.post("/categories").send({
+        //TODO: Token y Rol de acceso
+        const token = await createTokenAdmin();
+
+        const response = await API.post("/categories").set(token).send({
             name: "Soy una nueva categoria",
         });
 

@@ -11,6 +11,7 @@ const controller = require("../controllers/user");
 router.post("/login", validator.saveAdminOrLogin, controller.login);
 // TODO: TODOS
 router.post("/token/refresh", controller.tokenRefresh);
+router.post("/token/validate", controller.tokenValidate);
 // TODO: TODOS
 router.put(
     "/:id/password",

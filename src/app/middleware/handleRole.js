@@ -3,7 +3,7 @@ const ROLES = require("../utils/roles");
 
 const handleRole = (allowedRoles) => (req, res, next) => {
     try {
-        /* const { roles } = req.connectedUser;
+        const { roles } = req.connectedUser;
 
         const isPermited = allowedRoles.some((allowedRoles) =>
             roles.includes(allowedRoles)
@@ -12,7 +12,7 @@ const handleRole = (allowedRoles) => (req, res, next) => {
         if (!isPermited) {
             const message = "No tiene autorización >:(";
             throw HttpError(HttpStatus.FORBBIDEN, message);
-        } */
+        }
         next();
     } catch (error) {
         next(error);

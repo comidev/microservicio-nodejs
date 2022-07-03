@@ -128,6 +128,14 @@ module.exports = {
         const { id, username, roles } = jwtService.verify(tokenRefresh);
         return jwtService.createTokens({ id, username, roles });
     },
+    tokenValidate: (token) => {
+        try {
+            jwtService.verify(token);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    },
     updateUsername: async (username, userId) => {
         try {
             await userRepo.findByIdAndUpdate(userId, { username: username });
