@@ -1,4 +1,5 @@
 # Microservicio con NodeJS
 
-Bienvenido, el presente proyecto es una práctica de microservicios con NodeJS
-Aún se encuentra en desarrollo 🛠 ...
+- Más de 80 tests con Jest y Supertest
+- Manejo de JWT y Roles
+- API realizada con ExpressJS
